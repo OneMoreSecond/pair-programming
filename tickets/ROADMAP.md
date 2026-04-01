@@ -20,7 +20,6 @@ This roadmap tracks priority for all incomplete tickets.
 - `TICK-0018-manual-intervention-controls-between-rounds.md`
 - `TICK-0019-task-history-browsing-and-round-replay.md`
 - `TICK-0022-tester-role-and-test-pipeline-expansion.md`
-- `TICK-0029-pyproject-versioning-workflow-in-agents.md`
 
 ## P3
 
