@@ -7,7 +7,7 @@ This roadmap tracks priority for all incomplete tickets.
 
 ## P1
 
-- `TICK-0014-advanced-status-review-and-resume-controls.md`
+
 
 ## P2
 
