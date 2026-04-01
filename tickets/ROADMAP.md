@@ -11,7 +11,6 @@ This roadmap tracks priority for all incomplete tickets.
 - `TICK-0008-artifacts-command.md`
 - `TICK-0009-cli-output-and-error-improvements.md`
 - `TICK-0014-advanced-status-review-and-resume-controls.md`
-- `TICK-0028-terminal-user-readme-and-install-flow.md`
 
 ## P2
 
