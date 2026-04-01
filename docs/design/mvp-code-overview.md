@@ -51,6 +51,7 @@ PYTHONPATH=src python3 -m opencode_pair resume
 - CLI 可正常显示帮助
 - dry-run 模式可完成一轮并进入 `waiting_user`
 - `state.json`、round 目录和 prompt 工件可正常生成
+- 已完成一次真实非 dry-run 任务，developer 和 reviewer 都成功产出工件，并在第 1 轮通过
 
 ## 当前已知限制
 
@@ -62,6 +63,6 @@ PYTHONPATH=src python3 -m opencode_pair resume
 
 ## 下一步建议
 
-- 优先跑一次非 dry-run 的真实任务，观察 prompt 是否足够稳定
+- 继续跑更多真实任务，观察 prompt 是否在更复杂改动下仍然稳定
 - 如果 reviewer 格式波动较大，先加强 reviewer prompt 和解析器
 - 如果 developer 经常不写 note，可以把 note 写入改为更强约束或显式脚本化生成

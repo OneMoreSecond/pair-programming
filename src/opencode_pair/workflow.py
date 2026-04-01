@@ -171,13 +171,20 @@ def _developer_context(
 def _reviewer_context(
     paths: PairPaths, state: TaskState, round_dir: Path
 ) -> dict[str, str]:
+    test_summary_path = round_dir / "test-summary.md"
+    if test_summary_path.exists():
+        test_summary_section = (
+            f"Read `{relative_to(test_summary_path, paths.workdir)}` before reviewing."
+        )
+    else:
+        test_summary_section = "No test summary is available for this round."
     return {
         "goal": state.goal,
         "workdir": str(paths.workdir),
         "developer_note_path": relative_to(
             round_dir / "developer-note.md", paths.workdir
         ),
-        "test_summary_path": relative_to(round_dir / "test-summary.md", paths.workdir),
+        "test_summary_section": test_summary_section,
         "patch_path": relative_to(round_dir / "patch.diff", paths.workdir),
         "review_path": relative_to(round_dir / "review.md", paths.workdir),
     }

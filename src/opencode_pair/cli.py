@@ -25,6 +25,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     start = subparsers.add_parser("start", help="start a new pair task")
+    start.add_argument("--workdir", default=".", help="repository root to run in")
     start.add_argument("--goal", required=True, help="task goal")
     start.add_argument("--developer-model", default=None)
     start.add_argument("--reviewer-model", default=None)
@@ -36,9 +37,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     start.add_argument("--dry-run", action="store_true")
 
-    subparsers.add_parser("status", help="show current task status")
-    subparsers.add_parser("resume", help="resume the current task")
+    status = subparsers.add_parser("status", help="show current task status")
+    status.add_argument("--workdir", default=".", help="repository root to run in")
+
+    resume = subparsers.add_parser("resume", help="resume the current task")
+    resume.add_argument("--workdir", default=".", help="repository root to run in")
+
     review = subparsers.add_parser("review", help="show latest review summary")
+    review.add_argument("--workdir", default=".", help="repository root to run in")
     review.add_argument("--round", type=int, default=None, dest="round_number")
 
     return parser

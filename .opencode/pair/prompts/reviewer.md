@@ -21,8 +21,8 @@ Rules:
 # Developer Note Path
 `{{developer_note_path}}`
 
-# Test Summary Path
-`{{test_summary_path}}`
+# Test Summary
+{{test_summary_section}}
 
 # Patch Diff Path
 `{{patch_path}}`
