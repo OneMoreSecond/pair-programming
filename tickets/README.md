@@ -37,3 +37,6 @@ This directory is the source of truth for repository requirements.
 - `TICK-0024-structured-review-export-and-protocol-evolution.md`
 - `TICK-0025-observability-metrics-and-local-reporting.md`
 - `TICK-0026-real-task-regression-and-prompt-evaluation-harness.md`
+- `TICK-0028-terminal-user-readme-and-install-flow.md`
+- `TICK-0029-pyproject-versioning-workflow-in-agents.md`
+- `TICK-0030-default-workdir-current-directory.md`
