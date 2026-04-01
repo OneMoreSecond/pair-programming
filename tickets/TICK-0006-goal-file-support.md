@@ -4,7 +4,7 @@ Support reading task goals from a markdown file
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -39,3 +39,4 @@ Allow the CLI to accept a goal from a file so larger task descriptions can be st
 ## Notes
 
 - This was identified as a natural next usability improvement for real usage.
+- `start` now accepts `--goal-file`, validates file readability, and keeps `--goal` and `--goal-file` mutually exclusive.

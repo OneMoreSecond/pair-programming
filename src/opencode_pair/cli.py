@@ -27,7 +27,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     start = subparsers.add_parser("start", help="start a new pair task")
     start.add_argument("--workdir", default=".", help="repository root to run in")
-    start.add_argument("--goal", required=True, help="task goal")
+    goal_group = start.add_mutually_exclusive_group(required=True)
+    goal_group.add_argument("--goal", help="task goal")
+    goal_group.add_argument(
+        "--goal-file", help="path to a file containing the task goal"
+    )
     start.add_argument("--developer-model", default=None)
     start.add_argument("--reviewer-model", default=None)
     start.add_argument("--test-command", default=None)
@@ -120,14 +124,33 @@ def print_preflight(report) -> None:
             print(f"- {item}")
 
 
+def load_goal(goal: str | None, goal_file: str | None) -> str:
+    if goal is not None:
+        return goal
+    if goal_file is None:
+        raise ValueError("either --goal or --goal-file is required")
+    path = Path(goal_file)
+    try:
+        return path.read_text(encoding="utf-8").strip()
+    except FileNotFoundError as exc:
+        raise ValueError(f"goal file not found: {goal_file}") from exc
+    except OSError as exc:
+        raise ValueError(f"could not read goal file: {goal_file}") from exc
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     paths = PairPaths(Path(args.workdir))
 
     if args.command == "start":
+        try:
+            goal_text = load_goal(args.goal, args.goal_file)
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
         config = TaskConfig(
-            goal=args.goal,
+            goal=goal_text,
             developer_model=args.developer_model,
             reviewer_model=args.reviewer_model,
             max_rounds=args.max_rounds,

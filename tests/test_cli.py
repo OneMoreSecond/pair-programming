@@ -1,6 +1,6 @@
 import unittest
 
-from opencode_pair.cli import build_parser
+from opencode_pair.cli import build_parser, load_goal
 
 
 class CliTests(unittest.TestCase):
@@ -23,3 +23,12 @@ class CliTests(unittest.TestCase):
         args = parser.parse_args(["review", "--round", "2"])
         self.assertEqual(args.command, "review")
         self.assertEqual(args.round_number, 2)
+
+    def test_goal_file_argument_parses(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["start", "--goal-file", "task.md"])
+        self.assertEqual(args.command, "start")
+        self.assertEqual(args.goal_file, "task.md")
+
+    def test_load_goal_prefers_inline_goal(self) -> None:
+        self.assertEqual(load_goal("Inline goal", None), "Inline goal")

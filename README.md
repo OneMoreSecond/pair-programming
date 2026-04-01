@@ -48,6 +48,12 @@ opencode-pair start \
   --dry-run
 ```
 
+如果任务描述比较长，也可以从文件读取：
+
+```bash
+opencode-pair start --goal-file ./task.md --dry-run
+```
+
 启动前会执行轻量 preflight，提前提示常见问题，例如：
 
 - prompt 模板缺失
@@ -79,6 +85,7 @@ opencode-pair start \
 可选参数：
 
 - `--workdir <path>`
+- `--goal-file <path>`
 - `--developer-model <provider/model>`
 - `--reviewer-model <provider/model>`
 - `--test-command "pytest -q"`
