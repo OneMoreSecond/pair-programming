@@ -109,6 +109,45 @@ def ensure_round_record(state: TaskState) -> RoundRecord:
     return record
 
 
+def previous_round_record(state: TaskState) -> Optional[RoundRecord]:
+    target = state.current_round - 1
+    for record in state.rounds:
+        if record.round == target:
+            return record
+    return None
+
+
+def detect_progress_issues(
+    state: TaskState, record: RoundRecord, patch_text: str
+) -> list[str]:
+    issues: list[str] = []
+    previous = previous_round_record(state)
+    record.patch_changed = bool(patch_text.strip())
+
+    if not record.patch_changed:
+        issues.append("current round produced an empty patch")
+
+    if previous and previous.patch_path:
+        prev_patch_path = Path(state.workdir) / previous.patch_path
+        if prev_patch_path.exists():
+            prev_patch_text = prev_patch_path.read_text(encoding="utf-8")
+            if patch_text == prev_patch_text:
+                issues.append(
+                    "current round patch is unchanged from the previous round"
+                )
+
+    if previous and previous.review_status == "CHANGES_REQUESTED":
+        if (
+            record.blocking_count >= previous.blocking_count
+            and record.blocking_count > 0
+        ):
+            issues.append(
+                "blocking issue count did not decrease from the previous round"
+            )
+
+    return issues
+
+
 def write_fallback_developer_note(path: Path, focus: str) -> None:
     if path.exists():
         return
@@ -240,6 +279,7 @@ def run_developer_round(paths: PairPaths, config: TaskConfig, state: TaskState) 
         patch_text = ""
     write_patch(patch_path, patch_text)
     record.patch_path = relative_to(patch_path, paths.workdir)
+    record.patch_changed = bool(patch_text.strip())
 
     state.status = STATUS_DEVELOPER_COMPLETED
     state.resume_from = RESUME_TEST if config.test_command else RESUME_REVIEWER
@@ -353,6 +393,12 @@ def run_reviewer_round(paths: PairPaths, config: TaskConfig, state: TaskState) -
     record.blocking_count = parsed.blocking_count
     record.completed_at = utc_now()
     state.last_review_status = parsed.status
+    progress_issues = detect_progress_issues(
+        state,
+        record,
+        review_path.parent.joinpath("patch.diff").read_text(encoding="utf-8"),
+    )
+    record.progress_notes = progress_issues
 
     if parsed.status == "APPROVED":
         state.status = STATUS_APPROVED
@@ -361,7 +407,11 @@ def run_reviewer_round(paths: PairPaths, config: TaskConfig, state: TaskState) -
         record.status = STATUS_APPROVED
     else:
         record.status = STATUS_CHANGES_REQUESTED
-        if state.current_round >= state.max_rounds:
+        if progress_issues:
+            state.status = STATUS_WAITING_USER
+            state.resume_from = RESUME_DEVELOPER
+            state.last_warning = "; ".join(progress_issues)
+        elif state.current_round >= state.max_rounds:
             state.status = STATUS_WAITING_USER
             state.resume_from = RESUME_DEVELOPER
         elif state.mode == MODE_AUTO:

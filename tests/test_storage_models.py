@@ -42,3 +42,4 @@ class StorageModelTests(unittest.TestCase):
             self.assertEqual(loaded.task_id, "pair-1")
             self.assertEqual(loaded.goal, "Goal")
             self.assertEqual(loaded.current_round, 1)
+            self.assertIsNone(loaded.last_warning)

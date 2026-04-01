@@ -4,7 +4,7 @@ Add progress detection and loop prevention policies
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -39,3 +39,4 @@ Detect when the workflow is failing to make progress and stop infinite or low-va
 ## Notes
 
 - This requirement comes from the state machine and operations design.
+- The workflow now records simple progress signals and escalates to `waiting_user` when patch progress stalls or blocker counts stop improving.

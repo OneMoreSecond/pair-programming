@@ -41,6 +41,8 @@ class RoundRecord:
     review_status: Optional[str] = None
     blocking_count: int = 0
     reviewer_attempts: int = 0
+    patch_changed: Optional[bool] = None
+    progress_notes: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -94,6 +96,7 @@ class TaskState:
     last_review_status: Optional[str] = None
     resume_from: str = RESUME_DEVELOPER
     last_error: Optional[str] = None
+    last_warning: Optional[str] = None
     rounds: List[RoundRecord] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:

@@ -64,6 +64,8 @@ def print_status(paths: PairPaths) -> int:
     print(f"Resume from: {state.resume_from}")
     if state.last_error:
         print(f"Last error: {state.last_error}")
+    if state.last_warning:
+        print(f"Last warning: {state.last_warning}")
     if state.rounds:
         latest = state.rounds[-1]
         print(
@@ -71,6 +73,10 @@ def print_status(paths: PairPaths) -> int:
         )
         if latest.review_path:
             print(f"Latest review: {latest.review_path}")
+        if latest.progress_notes:
+            print("Progress notes:")
+            for note in latest.progress_notes:
+                print(f"- {note}")
     if config.dry_run:
         print("Dry run: enabled")
     return 0
