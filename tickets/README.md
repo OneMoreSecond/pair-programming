@@ -40,3 +40,8 @@ This directory is the source of truth for repository requirements.
 - `TICK-0028-terminal-user-readme-and-install-flow.md`
 - `TICK-0029-pyproject-versioning-workflow-in-agents.md`
 - `TICK-0030-default-workdir-current-directory.md`
+- `TICK-0038-version-bump-after-p1-batch.md`
+- `TICK-0039-split-configuration-management-into-child-tickets.md`
+- `TICK-0040-config-inspect-command.md`
+- `TICK-0041-project-config-file-loading.md`
+- `TICK-0042-config-precedence-and-task-overrides.md`

@@ -39,3 +39,7 @@ Support project-level and task-level configuration for models, modes, test comma
 ## Notes
 
 - This includes the configuration responsibilities described across `cli.md`, `architecture.md`, and `operations.md`.
+- Child tickets:
+  - `TICK-0040-config-inspect-command.md`
+  - `TICK-0041-project-config-file-loading.md`
+  - `TICK-0042-config-precedence-and-task-overrides.md`
