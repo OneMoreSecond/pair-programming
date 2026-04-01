@@ -1,96 +1,84 @@
 # Opencode Pair MVP
 
-`opencode-pair` 是一个基于 `opencode` 的最小可运行 AI pair programming 工作流原型。
+`opencode-pair` 是一个面向终端用户的 AI pair programming 工作流原型。
 
-它通过三个角色协作完成一轮或多轮开发闭环：
+它会在本地仓库里串行调度两个角色：
 
-- `orchestrator`：调度轮次、落盘状态、组装 prompt
-- `developer`：实现需求或根据 review 修改代码
-- `reviewer`：只读审查当前 round 改动，并输出结构化 `review.md`
+- developer：负责实现或修改代码
+- reviewer：负责审查当前 round 改动并输出结构化 `review.md`
 
-当前版本的目标是验证流程，而不是提供完整产品能力。
+当前版本是一个可运行的 MVP，适合先验证小到中等规模的任务闭环。
 
-## 当前能力
+## 你可以用它做什么
 
-- 初始化 pair task 并保存任务状态
-- 生成 developer / reviewer prompt 文件
-- 调用 `opencode run` 启动两个角色的 session
-- 生成 round 级工件目录
-- 解析 `review.md` 的 `Status`
-- 支持 `start` / `status` / `review` / `resume`
-- 支持 `--dry-run` 验证状态流转
+- 启动一个 developer -> reviewer 的工作流
+- 让每一轮工件自动落盘
+- 查看当前任务状态和最近 review
+- 在 `waiting_user` 状态下继续下一轮
+- 用 `--dry-run` 先验证流程是否能跑通
 
-## 目录结构
+## 安装
 
-```text
-src/opencode_pair/          Python MVP 代码
-.opencode/pair/prompts/     默认 prompt 模板
-docs/design/                设计文档
-examples/                   示例任务
-tests/                      基础测试
-```
-
-运行中的任务工件会生成到：
-
-```text
-.opencode/pair/tasks/<task-id>/
-```
-
-## 环境要求
+要求：
 
 - Python 3.9+
 - 本机可用的 `opencode` CLI
 
-## 快速开始
-
-### 1. 查看 CLI
+在仓库根目录安装当前项目：
 
 ```bash
-PYTHONPATH=src python3 -m opencode_pair --help
+python3 -m pip install -e .
 ```
 
-### 2. 先用 dry-run 验证流程
+安装后可以直接使用：
 
 ```bash
-PYTHONPATH=src python3 -m opencode_pair start \
-  --workdir . \
+opencode-pair --help
+```
+
+如果你只是开发这个项目本身，也可以继续用模块方式运行，但这属于开发者用法，不是推荐的终端用户入口。
+
+## 快速开始
+
+### 1. 先做一次 dry-run
+
+```bash
+opencode-pair start \
   --goal "Create a small sample artifact for the pair workflow" \
   --dry-run
 ```
 
-启动前会执行轻量 preflight，提前报告常见问题，例如：
+启动前会执行轻量 preflight，提前提示常见问题，例如：
 
 - prompt 模板缺失
 - `opencode` 不在 PATH 中
 - git 工作区已有未提交改动
 - 配置的测试命令可能不可执行
 
-### 3. 查看状态和 review
+### 2. 查看状态和 review
 
 ```bash
-PYTHONPATH=src python3 -m opencode_pair status --workdir .
-PYTHONPATH=src python3 -m opencode_pair review --workdir .
+opencode-pair status
+opencode-pair review
 ```
 
-### 4. 继续下一轮
+### 3. 继续下一轮
 
 ```bash
-PYTHONPATH=src python3 -m opencode_pair resume --workdir .
+opencode-pair resume
 ```
 
 ## 真实运行示例
 
-只要本机 `opencode` 可用，就可以去掉 `--dry-run`：
-
 ```bash
-PYTHONPATH=src python3 -m opencode_pair start \
-  --workdir . \
+opencode-pair start \
   --goal "Add a small markdown file documenting the pair workflow" \
   --mode semi_auto
 ```
 
 可选参数：
 
+- `--workdir <path>`
 - `--developer-model <provider/model>`
 - `--reviewer-model <provider/model>`
 - `--test-command "pytest -q"`
@@ -98,58 +86,43 @@ PYTHONPATH=src python3 -m opencode_pair start \
 - `--max-rounds 3`
 - `--mode auto|semi_auto`
 
-## Prompt 模板
+默认情况下，`--workdir` 使用当前目录。
 
-默认模板在：
+## 运行后会生成什么
 
-- `.opencode/pair/prompts/developer.md`
-- `.opencode/pair/prompts/reviewer.md`
+任务工件会写到：
 
-MVP 直接读取这两个文件并注入变量，因此你可以先从这里调 prompt。
+```text
+.opencode/pair/tasks/<task-id>/
+```
 
-## 工件说明
-
-每个 round 目录通常包含：
+每个 round 通常包含：
 
 - `developer-input.md`
 - `developer.log`
 - `developer-note.md`
 - `patch.diff`
-- `test.log` / `test-summary.md`（如果配置了测试）
+- `test.log` / `test-summary.md`
 - `reviewer-input.md`
 - `reviewer.log`
 - `review.md`
 
-## 测试
-
-运行基础测试：
-
-```bash
-PYTHONPATH=src python3 -m unittest discover -s tests -p "test_*.py"
-```
-
 ## 当前限制
 
-- 仍是独立 MVP，还没有接入 `opencode pair` 官方子命令
-- review 解析器目前只覆盖最小协议
-- 真实运行效果依赖 `opencode` 模型行为和 prompt 稳定性
+- 还不是原生 `opencode pair` 子命令
+- review 协议和恢复策略还在持续增强
+- 更复杂的多轮真实代码任务还需要更多回归验证
 
-## 真实运行结果
+## 开发者说明
 
-已经在当前仓库完成过一次真实非 dry-run 验证：
+如果你在开发这个项目本身：
 
-- 任务创建成功
-- developer 成功写入目标 markdown 文件和 `developer-note.md`
-- reviewer 成功写入结构化 `review.md`
-- 工作流在第 1 轮直接 `APPROVED`
+- 设计文档在 `docs/design/`
+- ticket 流程在 `AGENTS.md`
+- backlog 在 `tickets/`
 
-示例产物可参考：
+运行测试：
 
-- `examples/real-run-artifact.md`
-- `.opencode/pair/tasks/pair-20260401-103928/rounds/001/developer-note.md`
-- `.opencode/pair/tasks/pair-20260401-103928/rounds/001/review.md`
-
-## 相关文档
-
-- `docs/design/README.md`
-- `docs/design/mvp-code-overview.md`
+```bash
+python3 -m unittest discover -s tests -p "test_*.py"
+```
