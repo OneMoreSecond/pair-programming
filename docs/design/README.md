@@ -13,6 +13,7 @@
 - `docs/design/prompts.md`：prompt 模板设计，提供 developer 和 reviewer 的模板初稿
 - `docs/design/state.md`：状态文件 schema，定义 `state.json` 的结构与字段语义
 - `docs/design/implementation-plan.md`：MVP 实施计划，定义实现阶段、模块拆分和验收用例
+- `docs/design/mvp-code-overview.md`：当前代码骨架说明，概览已落地的 Python MVP 模块和限制
 
 ## 推荐阅读顺序
 
@@ -24,7 +25,8 @@
 6. `docs/design/prompts.md`
 7. `docs/design/state.md`
 8. `docs/design/implementation-plan.md`
-9. `docs/design/operations.md`
+9. `docs/design/mvp-code-overview.md`
+10. `docs/design/operations.md`
 
 ## 当前设计结论
 

@@ -1,0 +1,41 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+
+class PairPaths:
+    def __init__(self, workdir: Path):
+        self.workdir = workdir.resolve()
+        self.root = self.workdir / ".opencode" / "pair"
+        self.prompts_dir = self.root / "prompts"
+        self.tasks_dir = self.root / "tasks"
+        self.current_task_file = self.root / "current_task"
+
+    def ensure_root(self) -> None:
+        self.root.mkdir(parents=True, exist_ok=True)
+        self.prompts_dir.mkdir(parents=True, exist_ok=True)
+        self.tasks_dir.mkdir(parents=True, exist_ok=True)
+
+    def task_dir(self, task_id: str) -> Path:
+        return self.tasks_dir / task_id
+
+    def rounds_dir(self, task_id: str) -> Path:
+        return self.task_dir(task_id) / "rounds"
+
+    def round_dir(self, task_id: str, round_number: int) -> Path:
+        return self.rounds_dir(task_id) / f"{round_number:03d}"
+
+    def config_path(self, task_id: str) -> Path:
+        return self.task_dir(task_id) / "config.json"
+
+    def state_path(self, task_id: str) -> Path:
+        return self.task_dir(task_id) / "state.json"
+
+    def goal_path(self, task_id: str) -> Path:
+        return self.task_dir(task_id) / "goal.md"
+
+    def developer_template_path(self) -> Path:
+        return self.prompts_dir / "developer.md"
+
+    def reviewer_template_path(self) -> Path:
+        return self.prompts_dir / "reviewer.md"

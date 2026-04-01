@@ -1,0 +1,4 @@
+__pycache__/
+.pytest_cache/
+.opencode/pair/current_task
+.opencode/pair/tasks/
