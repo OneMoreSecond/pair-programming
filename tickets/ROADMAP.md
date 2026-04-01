@@ -4,10 +4,6 @@ This roadmap tracks priority for all incomplete tickets.
 
 ## P0
 
-- `TICK-0007-git-based-patch-diff.md`
-- `TICK-0016-review-validation-and-retry-hardening.md`
-- `TICK-0015-preflight-checks-and-workspace-safety-guards.md`
-- `TICK-0017-progress-detection-and-loop-prevention.md`
 
 ## P1
 
@@ -15,6 +11,7 @@ This roadmap tracks priority for all incomplete tickets.
 - `TICK-0008-artifacts-command.md`
 - `TICK-0009-cli-output-and-error-improvements.md`
 - `TICK-0014-advanced-status-review-and-resume-controls.md`
+- `TICK-0028-terminal-user-readme-and-install-flow.md`
 
 ## P2
 
@@ -23,6 +20,7 @@ This roadmap tracks priority for all incomplete tickets.
 - `TICK-0018-manual-intervention-controls-between-rounds.md`
 - `TICK-0019-task-history-browsing-and-round-replay.md`
 - `TICK-0022-tester-role-and-test-pipeline-expansion.md`
+- `TICK-0029-pyproject-versioning-workflow-in-agents.md`
 
 ## P3
 

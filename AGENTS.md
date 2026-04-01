@@ -90,6 +90,7 @@ When there are unfinished tickets:
 3. Start work from the highest active priority bucket first.
 4. Only split a large ticket after it has been selected for implementation.
 5. Complete and commit one ticket at a time.
+6. After a ticket is completed, remove it from `tickets/ROADMAP.md`.
 
 ### Roadmap Priority Buckets
 
@@ -106,6 +107,15 @@ Use these buckets in `tickets/ROADMAP.md`:
 - Each completed ticket must have its own git commit.
 - The commit message must include the ticket ID.
 - Do not bundle multiple completed tickets into one commit.
+
+## Versioning Workflow
+
+- The project version source of truth is `pyproject.toml` under `[project].version`.
+- A version bump is required after completing a batch of roadmap tickets.
+- A batch means one contiguous execution pass over a selected roadmap slice, such as finishing the current active priority set or an intentionally chosen subset worked as a release unit.
+- Patch version bumps are the default unless a larger compatibility or feature milestone clearly justifies a minor or major bump.
+- The version bump should happen after the batch tickets are completed and before moving on to the next roadmap batch.
+- The version bump should be recorded in its own ticketed change or in an explicit release-management ticket if one exists.
 
 ## Current Source Of Truth
 
