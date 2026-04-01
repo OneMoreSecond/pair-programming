@@ -71,6 +71,16 @@ opencode-pair artifacts
 
 如果当前没有活动任务，CLI 会直接告诉你下一步该执行什么。
 
+更深入的查询方式：
+
+```bash
+opencode-pair status --json
+opencode-pair status --verbose
+opencode-pair review --round 2
+opencode-pair artifacts --round 2
+opencode-pair resume --from reviewer
+```
+
 ### 3. 继续下一轮
 
 ```bash

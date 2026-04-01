@@ -93,6 +93,12 @@ def load_current_task(paths: PairPaths) -> tuple[TaskConfig, TaskState]:
     )
 
 
+def load_task_by_id(paths: PairPaths, task_id: str) -> tuple[TaskConfig, TaskState]:
+    return load_config(paths.config_path(task_id)), load_state(
+        paths.state_path(task_id)
+    )
+
+
 def save_task(paths: PairPaths, state: TaskState) -> None:
     state.updated_at = utc_now()
     save_state(paths.state_path(state.task_id), state)
@@ -465,4 +471,11 @@ def resume_task(paths: PairPaths) -> TaskState:
         state.current_round += 1
         state.resume_from = RESUME_DEVELOPER
         save_task(paths, state)
+    return advance_task(paths, config, state)
+
+
+def resume_task_from(paths: PairPaths, from_phase: str) -> TaskState:
+    config, state = load_current_task(paths)
+    state.resume_from = from_phase
+    save_task(paths, state)
     return advance_task(paths, config, state)

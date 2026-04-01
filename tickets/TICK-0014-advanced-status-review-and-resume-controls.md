@@ -4,7 +4,7 @@ Expand status, review, and resume controls for better recovery and inspection
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -39,3 +39,4 @@ Improve the query and recovery surface so users can inspect tasks more deeply an
 ## Notes
 
 - This consolidates advanced status and recovery capabilities from `cli.md` and `workflow.md`.
+- The CLI now supports `status --json/--verbose`, task-targeted inspection, and `resume --from` for safe phase selection.

@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
 from .models import (
     MODE_AUTO,
     MODE_SEMI_AUTO,
+    RESUME_DEVELOPER,
+    RESUME_REVIEWER,
+    RESUME_TEST,
     STATUS_APPROVED,
     STATUS_WAITING_USER,
     TaskConfig,
@@ -14,7 +18,14 @@ from .models import (
 from .paths import PairPaths
 from .preflight import run_preflight
 from .review_parser import parse_review_file
-from .workflow import advance_task, init_task, load_current_task, resume_task
+from .workflow import (
+    advance_task,
+    init_task,
+    load_current_task,
+    load_task_by_id,
+    resume_task,
+    resume_task_from,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -44,28 +55,56 @@ def build_parser() -> argparse.ArgumentParser:
 
     status = subparsers.add_parser("status", help="show current task status")
     status.add_argument("--workdir", default=".", help="repository root to run in")
+    status.add_argument("--task-id", default=None, help="inspect a specific task")
+    status.add_argument("--json", action="store_true", dest="as_json")
+    status.add_argument("--verbose", action="store_true")
 
     resume = subparsers.add_parser("resume", help="resume the current task")
     resume.add_argument("--workdir", default=".", help="repository root to run in")
+    resume.add_argument(
+        "--from",
+        dest="from_phase",
+        choices=[RESUME_DEVELOPER, RESUME_REVIEWER, RESUME_TEST],
+        default=None,
+        help="resume from a specific safe phase",
+    )
 
     review = subparsers.add_parser("review", help="show latest review summary")
     review.add_argument("--workdir", default=".", help="repository root to run in")
+    review.add_argument("--task-id", default=None, help="inspect a specific task")
     review.add_argument("--round", type=int, default=None, dest="round_number")
 
     artifacts = subparsers.add_parser("artifacts", help="list task artifacts")
     artifacts.add_argument("--workdir", default=".", help="repository root to run in")
+    artifacts.add_argument("--task-id", default=None, help="inspect a specific task")
     artifacts.add_argument("--round", type=int, default=None, dest="round_number")
 
     return parser
 
 
-def print_status(paths: PairPaths) -> int:
+def _load_state_for_query(paths: PairPaths, task_id: str | None):
+    if task_id:
+        return load_task_by_id(paths, task_id)
+    return load_current_task(paths)
+
+
+def print_status(
+    paths: PairPaths,
+    task_id: str | None = None,
+    as_json: bool = False,
+    verbose: bool = False,
+) -> int:
     try:
-        config, state = load_current_task(paths)
+        config, state = _load_state_for_query(paths, task_id)
     except FileNotFoundError:
         print("No active task found.", file=sys.stderr)
         print('Next action: run `opencode-pair start --goal "..."`', file=sys.stderr)
         return 1
+    if as_json:
+        payload = state.to_dict()
+        payload["config"] = config.to_dict()
+        print(json.dumps(payload, indent=2))
+        return 0
     print(f"Task: {state.task_id}")
     print(f"Status: {state.status}")
     print(f"Round: {state.current_round}/{state.max_rounds}")
@@ -92,12 +131,20 @@ def print_status(paths: PairPaths) -> int:
                 print(f"- {note}")
     if config.dry_run:
         print("Dry run: enabled")
+    if verbose and state.rounds:
+        print("Rounds:")
+        for record in state.rounds:
+            print(
+                f"- round {record.round}: status={record.status}, review_status={record.review_status or '-'}, blocking={record.blocking_count}"
+            )
     return 0
 
 
-def print_review(paths: PairPaths, round_number: int | None) -> int:
+def print_review(
+    paths: PairPaths, task_id: str | None = None, round_number: int | None = None
+) -> int:
     try:
-        _, state = load_current_task(paths)
+        _, state = _load_state_for_query(paths, task_id)
     except FileNotFoundError:
         print("No active task found.", file=sys.stderr)
         print('Next action: run `opencode-pair start --goal "..."`', file=sys.stderr)
@@ -134,9 +181,11 @@ def print_review(paths: PairPaths, round_number: int | None) -> int:
     return 0
 
 
-def print_artifacts(paths: PairPaths, round_number: int | None) -> int:
+def print_artifacts(
+    paths: PairPaths, task_id: str | None = None, round_number: int | None = None
+) -> int:
     try:
-        _, state = load_current_task(paths)
+        _, state = _load_state_for_query(paths, task_id)
     except FileNotFoundError:
         print("No active task found.", file=sys.stderr)
         print('Next action: run `opencode-pair start --goal "..."`', file=sys.stderr)
@@ -244,11 +293,15 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "status":
-        return print_status(paths)
+        return print_status(paths, args.task_id, args.as_json, args.verbose)
 
     if args.command == "resume":
         try:
-            state = resume_task(paths)
+            state = (
+                resume_task_from(paths, args.from_phase)
+                if args.from_phase
+                else resume_task(paths)
+            )
         except FileNotFoundError:
             print("No active task found.", file=sys.stderr)
             print(
@@ -267,10 +320,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "review":
-        return print_review(paths, args.round_number)
+        return print_review(paths, args.task_id, args.round_number)
 
     if args.command == "artifacts":
-        return print_artifacts(paths, args.round_number)
+        return print_artifacts(paths, args.task_id, args.round_number)
 
     parser.error("unknown command")
     return 2
