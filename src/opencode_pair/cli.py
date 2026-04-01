@@ -280,6 +280,31 @@ def build_effective_defaults(paths: PairPaths) -> dict:
     return merged
 
 
+def build_task_config_from_args(paths: PairPaths, args, goal_text: str) -> TaskConfig:
+    defaults = build_effective_defaults(paths)
+    return TaskConfig(
+        goal=goal_text,
+        developer_model=args.developer_model
+        if args.developer_model is not None
+        else defaults["developer_model"],
+        reviewer_model=args.reviewer_model
+        if args.reviewer_model is not None
+        else defaults["reviewer_model"],
+        max_rounds=args.max_rounds if args.max_rounds != 3 else defaults["max_rounds"],
+        mode=args.mode if args.mode != MODE_SEMI_AUTO else defaults["mode"],
+        test_command=args.test_command
+        if args.test_command is not None
+        else defaults["test_command"],
+        opencode_agent=args.agent
+        if args.agent is not None
+        else defaults["opencode_agent"],
+        protocol_version=defaults["protocol_version"],
+        prompt_version=defaults["prompt_version"],
+        reviewer_retry_limit=defaults["reviewer_retry_limit"],
+        dry_run=args.dry_run if args.dry_run else defaults["dry_run"],
+    )
+
+
 def print_config(paths: PairPaths, as_json: bool) -> int:
     payload = build_effective_defaults(paths)
     payload["project_config_path"] = str(paths.project_config_path())
@@ -313,16 +338,7 @@ def main(argv: list[str] | None = None) -> int:
         except ValueError as exc:
             print(str(exc), file=sys.stderr)
             return 2
-        config = TaskConfig(
-            goal=goal_text,
-            developer_model=args.developer_model,
-            reviewer_model=args.reviewer_model,
-            max_rounds=args.max_rounds,
-            mode=args.mode,
-            test_command=args.test_command,
-            opencode_agent=args.agent,
-            dry_run=args.dry_run,
-        )
+        config = build_task_config_from_args(paths, args, goal_text)
         preflight = run_preflight(paths, config)
         print_preflight(preflight)
         if not preflight.ok:

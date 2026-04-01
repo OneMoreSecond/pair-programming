@@ -132,6 +132,12 @@ opencode-pair config
 opencode-pair config --json
 ```
 
+配置优先级为：
+
+```text
+CLI flags > task config > project config > built-in defaults
+```
+
 ## 运行后会生成什么
 
 任务工件会写到：

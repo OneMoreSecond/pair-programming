@@ -4,7 +4,7 @@ Implement config precedence and task-level overrides
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -37,3 +37,5 @@ Apply a clear precedence model across CLI flags, task config, project config, an
 ## Notes
 
 - Child ticket of `TICK-0012-configuration-and-default-policy-management.md`.
+- `start` now builds task config using a documented precedence model where CLI flags override project defaults and built-in defaults.
+- Follow-up ticket: `TICK-0045-distinguish-cli-defaults-from-explicit-args.md` for remaining parser-default ambiguity.

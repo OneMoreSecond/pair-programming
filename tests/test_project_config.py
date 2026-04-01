@@ -4,8 +4,13 @@ import tempfile
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
+from types import SimpleNamespace
 
-from opencode_pair.cli import build_effective_defaults, print_config
+from opencode_pair.cli import (
+    build_effective_defaults,
+    build_task_config_from_args,
+    print_config,
+)
 from opencode_pair.paths import PairPaths
 
 
@@ -37,3 +42,27 @@ class ProjectConfigTests(unittest.TestCase):
             output = buf.getvalue()
             self.assertEqual(code, 0)
             self.assertIn("project_config_present:", output)
+
+    def test_cli_values_override_project_defaults(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = PairPaths(Path(tmp))
+            paths.ensure_root()
+            paths.project_config_path().write_text(
+                json.dumps(
+                    {"mode": "auto", "max_rounds": 5, "test_command": "pytest -q"}
+                ),
+                encoding="utf-8",
+            )
+            args = SimpleNamespace(
+                developer_model=None,
+                reviewer_model=None,
+                max_rounds=2,
+                mode="auto",
+                test_command=None,
+                agent=None,
+                dry_run=False,
+            )
+            config = build_task_config_from_args(paths, args, "Goal")
+            self.assertEqual(config.max_rounds, 2)
+            self.assertEqual(config.mode, "auto")
+            self.assertEqual(config.test_command, "pytest -q")
