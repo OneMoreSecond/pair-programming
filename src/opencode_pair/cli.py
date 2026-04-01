@@ -18,6 +18,7 @@ from .models import (
 from .paths import PairPaths
 from .preflight import run_preflight
 from .review_parser import parse_review_file
+from .storage import load_optional_project_config
 from .workflow import (
     advance_task,
     init_task,
@@ -258,9 +259,31 @@ def load_goal(goal: str | None, goal_file: str | None) -> str:
         raise ValueError(f"could not read goal file: {goal_file}") from exc
 
 
-def print_config(as_json: bool) -> int:
-    defaults = TaskConfig(goal="<required at runtime>")
-    payload = defaults.to_dict()
+def build_effective_defaults(paths: PairPaths) -> dict:
+    defaults = TaskConfig(goal="<required at runtime>").to_dict()
+    project_config = load_optional_project_config(paths.project_config_path())
+    merged = dict(defaults)
+    for key in [
+        "developer_model",
+        "reviewer_model",
+        "max_rounds",
+        "mode",
+        "test_command",
+        "opencode_agent",
+        "reviewer_retry_limit",
+        "protocol_version",
+        "prompt_version",
+        "dry_run",
+    ]:
+        if key in project_config:
+            merged[key] = project_config[key]
+    return merged
+
+
+def print_config(paths: PairPaths, as_json: bool) -> int:
+    payload = build_effective_defaults(paths)
+    payload["project_config_path"] = str(paths.project_config_path())
+    payload["project_config_present"] = paths.project_config_path().exists()
     if as_json:
         print(json.dumps(payload, indent=2))
         return 0
@@ -274,6 +297,8 @@ def print_config(as_json: bool) -> int:
     print(f"- reviewer_retry_limit: {payload['reviewer_retry_limit']}")
     print(f"- protocol_version: {payload['protocol_version']}")
     print(f"- prompt_version: {payload['prompt_version']}")
+    print(f"- project_config_present: {payload['project_config_present']}")
+    print(f"- project_config_path: {payload['project_config_path']}")
     return 0
 
 
@@ -349,7 +374,7 @@ def main(argv: list[str] | None = None) -> int:
         return print_artifacts(paths, args.task_id, args.round_number)
 
     if args.command == "config":
-        return print_config(args.as_json)
+        return print_config(paths, args.as_json)
 
     parser.error("unknown command")
     return 2

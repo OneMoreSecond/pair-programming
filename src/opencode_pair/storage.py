@@ -32,3 +32,9 @@ def save_state(path: Path, state: TaskState) -> None:
 
 def load_state(path: Path) -> TaskState:
     return TaskState.from_dict(read_json(path))
+
+
+def load_optional_project_config(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    return read_json(path)

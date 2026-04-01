@@ -4,7 +4,7 @@ Load pair workflow defaults from a project config file
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -37,3 +37,4 @@ Support project-level pair workflow defaults from a config file in the repositor
 ## Notes
 
 - Child ticket of `TICK-0012-configuration-and-default-policy-management.md`.
+- The workflow now reads an optional project config file from `.opencode/pair/config.json` for default values.

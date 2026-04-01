@@ -10,6 +10,7 @@ class PairPaths:
         self.prompts_dir = self.root / "prompts"
         self.tasks_dir = self.root / "tasks"
         self.current_task_file = self.root / "current_task"
+        self.project_config_file = self.root / "config.json"
 
     def ensure_root(self) -> None:
         self.root.mkdir(parents=True, exist_ok=True)
@@ -39,3 +40,6 @@ class PairPaths:
 
     def reviewer_template_path(self) -> Path:
         return self.prompts_dir / "reviewer.md"
+
+    def project_config_path(self) -> Path:
+        return self.project_config_file

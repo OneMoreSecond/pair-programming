@@ -109,6 +109,29 @@ opencode-pair start \
 
 默认情况下，`--workdir` 使用当前目录。
 
+如果你想给当前仓库配置项目级默认值，可以放一个可选文件：
+
+```text
+.opencode/pair/config.json
+```
+
+例如：
+
+```json
+{
+  "mode": "auto",
+  "max_rounds": 5,
+  "test_command": "python3 -m unittest discover -s tests -p \"test_*.py\""
+}
+```
+
+然后可以用下面命令查看当前生效的项目默认值：
+
+```bash
+opencode-pair config
+opencode-pair config --json
+```
+
 ## 运行后会生成什么
 
 任务工件会写到：
