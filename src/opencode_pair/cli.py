@@ -52,6 +52,10 @@ def build_parser() -> argparse.ArgumentParser:
     review.add_argument("--workdir", default=".", help="repository root to run in")
     review.add_argument("--round", type=int, default=None, dest="round_number")
 
+    artifacts = subparsers.add_parser("artifacts", help="list task artifacts")
+    artifacts.add_argument("--workdir", default=".", help="repository root to run in")
+    artifacts.add_argument("--round", type=int, default=None, dest="round_number")
+
     return parser
 
 
@@ -110,6 +114,40 @@ def print_review(paths: PairPaths, round_number: int | None) -> int:
     print(f"Review path: {target.review_path}")
     if parsed.summary:
         print(f"Summary: {parsed.summary}")
+    return 0
+
+
+def print_artifacts(paths: PairPaths, round_number: int | None) -> int:
+    _, state = load_current_task(paths)
+    target = None
+    if round_number is None:
+        if state.rounds:
+            target = state.rounds[-1]
+    else:
+        for record in state.rounds:
+            if record.round == round_number:
+                target = record
+                break
+
+    if target is None:
+        print("No round artifacts found.", file=sys.stderr)
+        return 1
+
+    paths_to_print = [
+        target.developer_prompt_path,
+        target.developer_log_path,
+        target.developer_note_path,
+        target.patch_path,
+        target.test_log_path,
+        target.test_summary_path,
+        target.reviewer_prompt_path,
+        target.reviewer_log_path,
+        target.review_path,
+    ]
+    print(f"Round: {target.round}")
+    for item in paths_to_print:
+        if item:
+            print(item)
     return 0
 
 
@@ -194,6 +232,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "review":
         return print_review(paths, args.round_number)
+
+    if args.command == "artifacts":
+        return print_artifacts(paths, args.round_number)
 
     parser.error("unknown command")
     return 2

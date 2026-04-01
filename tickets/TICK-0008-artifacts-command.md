@@ -4,7 +4,7 @@ Add a CLI command to list task and round artifacts
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -39,3 +39,4 @@ Provide a dedicated command for listing round-level artifacts so users can quick
 ## Notes
 
 - This is useful for debugging and review-heavy workflows.
+- The CLI now includes an `artifacts` command for listing latest or selected round artifact paths.

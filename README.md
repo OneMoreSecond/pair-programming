@@ -66,6 +66,7 @@ opencode-pair start --goal-file ./task.md --dry-run
 ```bash
 opencode-pair status
 opencode-pair review
+opencode-pair artifacts
 ```
 
 ### 3. 继续下一轮
@@ -113,6 +114,13 @@ opencode-pair start \
 - `reviewer-input.md`
 - `reviewer.log`
 - `review.md`
+
+如果你想快速列出当前 round 的这些文件：
+
+```bash
+opencode-pair artifacts
+opencode-pair artifacts --round 2
+```
 
 ## 当前限制
 

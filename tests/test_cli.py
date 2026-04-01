@@ -24,6 +24,12 @@ class CliTests(unittest.TestCase):
         self.assertEqual(args.command, "review")
         self.assertEqual(args.round_number, 2)
 
+    def test_artifacts_round_argument_parses(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["artifacts", "--round", "2"])
+        self.assertEqual(args.command, "artifacts")
+        self.assertEqual(args.round_number, 2)
+
     def test_goal_file_argument_parses(self) -> None:
         parser = build_parser()
         args = parser.parse_args(["start", "--goal-file", "task.md"])
