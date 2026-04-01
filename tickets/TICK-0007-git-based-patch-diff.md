@@ -4,7 +4,7 @@ Replace snapshot patch generation with git-based diff
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -39,3 +39,4 @@ Improve review quality and patch accuracy by generating `patch.diff` from git st
 ## Notes
 
 - This is one of the most important upgrades for non-dry-run reliability.
+- `patch.diff` now uses git-aware diff generation for tracked and untracked files.

@@ -23,10 +23,10 @@ from .models import (
     TaskState,
 )
 from .paths import PairPaths
+from .patches import git_diff_text, is_git_repo, write_patch
 from .prompts import render_prompt_to_file
 from .review_parser import parse_review_file
 from .runner import run_opencode, run_test_command
-from .snapshot import build_patch, capture_snapshot, write_patch
 from .storage import load_config, load_state, save_config, save_state
 from .utils import ensure_parent, relative_to, slugify_task_id, utc_now
 
@@ -199,8 +199,6 @@ def run_developer_round(paths: PairPaths, config: TaskConfig, state: TaskState) 
     state.resume_from = RESUME_DEVELOPER
     save_task(paths, state)
 
-    before = capture_snapshot(paths.workdir)
-
     developer_prompt_path = round_dir / "developer-input.md"
     render_prompt_to_file(
         paths.developer_template_path(),
@@ -235,9 +233,12 @@ def run_developer_round(paths: PairPaths, config: TaskConfig, state: TaskState) 
     )
     record.developer_note_path = relative_to(developer_note_path, paths.workdir)
 
-    after = capture_snapshot(paths.workdir)
     patch_path = round_dir / "patch.diff"
-    write_patch(patch_path, build_patch(before, after))
+    if is_git_repo(paths.workdir):
+        patch_text = git_diff_text(paths.workdir)
+    else:
+        patch_text = ""
+    write_patch(patch_path, patch_text)
     record.patch_path = relative_to(patch_path, paths.workdir)
 
     state.status = STATUS_DEVELOPER_COMPLETED
