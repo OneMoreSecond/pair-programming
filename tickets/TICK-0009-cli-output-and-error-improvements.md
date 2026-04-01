@@ -4,7 +4,7 @@ Improve CLI output and error handling for real usage
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -39,3 +39,4 @@ Improve command-line usability with clearer errors, better summaries, and more f
 ## Notes
 
 - A related argument parsing bug around `--workdir` was already fixed, but broader usability improvements remain.
+- Common no-task and no-artifact CLI failures now return clearer, actionable next steps.

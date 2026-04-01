@@ -69,6 +69,8 @@ opencode-pair review
 opencode-pair artifacts
 ```
 
+如果当前没有活动任务，CLI 会直接告诉你下一步该执行什么。
+
 ### 3. 继续下一轮
 
 ```bash

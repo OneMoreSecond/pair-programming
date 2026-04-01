@@ -60,7 +60,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def print_status(paths: PairPaths) -> int:
-    config, state = load_current_task(paths)
+    try:
+        config, state = load_current_task(paths)
+    except FileNotFoundError:
+        print("No active task found.", file=sys.stderr)
+        print('Next action: run `opencode-pair start --goal "..."`', file=sys.stderr)
+        return 1
     print(f"Task: {state.task_id}")
     print(f"Status: {state.status}")
     print(f"Round: {state.current_round}/{state.max_rounds}")
@@ -91,7 +96,12 @@ def print_status(paths: PairPaths) -> int:
 
 
 def print_review(paths: PairPaths, round_number: int | None) -> int:
-    _, state = load_current_task(paths)
+    try:
+        _, state = load_current_task(paths)
+    except FileNotFoundError:
+        print("No active task found.", file=sys.stderr)
+        print('Next action: run `opencode-pair start --goal "..."`', file=sys.stderr)
+        return 1
     target = None
     if round_number is None:
         for record in reversed(state.rounds):
@@ -104,7 +114,14 @@ def print_review(paths: PairPaths, round_number: int | None) -> int:
                 target = record
                 break
     if target is None or not target.review_path:
-        print("No review found.", file=sys.stderr)
+        if round_number is None:
+            print("No review found for the current task.", file=sys.stderr)
+        else:
+            print(f"No review found for round {round_number}.", file=sys.stderr)
+        print(
+            "Next action: run `opencode-pair status` to inspect task progress",
+            file=sys.stderr,
+        )
         return 1
     review_path = paths.workdir / target.review_path
     parsed = parse_review_file(review_path)
@@ -118,7 +135,12 @@ def print_review(paths: PairPaths, round_number: int | None) -> int:
 
 
 def print_artifacts(paths: PairPaths, round_number: int | None) -> int:
-    _, state = load_current_task(paths)
+    try:
+        _, state = load_current_task(paths)
+    except FileNotFoundError:
+        print("No active task found.", file=sys.stderr)
+        print('Next action: run `opencode-pair start --goal "..."`', file=sys.stderr)
+        return 1
     target = None
     if round_number is None:
         if state.rounds:
@@ -130,7 +152,14 @@ def print_artifacts(paths: PairPaths, round_number: int | None) -> int:
                 break
 
     if target is None:
-        print("No round artifacts found.", file=sys.stderr)
+        if round_number is None:
+            print("No round artifacts found for the current task.", file=sys.stderr)
+        else:
+            print(f"No artifacts found for round {round_number}.", file=sys.stderr)
+        print(
+            "Next action: run `opencode-pair status` to inspect available rounds",
+            file=sys.stderr,
+        )
         return 1
 
     paths_to_print = [
@@ -218,7 +247,14 @@ def main(argv: list[str] | None = None) -> int:
         return print_status(paths)
 
     if args.command == "resume":
-        state = resume_task(paths)
+        try:
+            state = resume_task(paths)
+        except FileNotFoundError:
+            print("No active task found.", file=sys.stderr)
+            print(
+                'Next action: run `opencode-pair start --goal "..."`', file=sys.stderr
+            )
+            return 1
         print(f"Task: {state.task_id}")
         print(f"Status: {state.status}")
         print(f"Round: {state.current_round}/{state.max_rounds}")
@@ -226,7 +262,7 @@ def main(argv: list[str] | None = None) -> int:
             print("Result: approved")
             return 0
         if state.status == STATUS_WAITING_USER:
-            print("Next action: inspect review and resume again")
+            print("Next action: inspect review or artifacts, then resume again")
             return 3
         return 0
 

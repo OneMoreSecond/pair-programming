@@ -2,6 +2,7 @@ import io
 import tempfile
 import unittest
 from contextlib import redirect_stdout
+from contextlib import redirect_stderr
 from pathlib import Path
 
 from opencode_pair.cli import print_artifacts
@@ -62,3 +63,14 @@ class ArtifactsCommandTests(unittest.TestCase):
             self.assertIn("rounds/001/developer-note.md", output)
             self.assertIn("rounds/001/patch.diff", output)
             self.assertIn("rounds/001/review.md", output)
+
+    def test_print_artifacts_without_task_is_actionable(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = PairPaths(Path(tmp))
+            buf = io.StringIO()
+            with redirect_stderr(buf):
+                code = print_artifacts(paths, None)
+            output = buf.getvalue()
+            self.assertEqual(code, 1)
+            self.assertIn("No active task found.", output)
+            self.assertIn("Next action:", output)
