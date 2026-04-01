@@ -46,6 +46,12 @@ class CliTests(unittest.TestCase):
         self.assertEqual(args.command, "resume")
         self.assertEqual(args.from_phase, "reviewer")
 
+    def test_config_json_parses(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["config", "--json"])
+        self.assertEqual(args.command, "config")
+        self.assertTrue(args.as_json)
+
     def test_goal_file_argument_parses(self) -> None:
         parser = build_parser()
         args = parser.parse_args(["start", "--goal-file", "task.md"])

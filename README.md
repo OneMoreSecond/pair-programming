@@ -76,6 +76,7 @@ opencode-pair artifacts
 ```bash
 opencode-pair status --json
 opencode-pair status --verbose
+opencode-pair config
 opencode-pair review --round 2
 opencode-pair artifacts --round 2
 opencode-pair resume --from reviewer

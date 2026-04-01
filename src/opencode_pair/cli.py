@@ -79,6 +79,10 @@ def build_parser() -> argparse.ArgumentParser:
     artifacts.add_argument("--task-id", default=None, help="inspect a specific task")
     artifacts.add_argument("--round", type=int, default=None, dest="round_number")
 
+    config_cmd = subparsers.add_parser("config", help="show workflow configuration")
+    config_cmd.add_argument("--workdir", default=".", help="repository root to run in")
+    config_cmd.add_argument("--json", action="store_true", dest="as_json")
+
     return parser
 
 
@@ -254,6 +258,25 @@ def load_goal(goal: str | None, goal_file: str | None) -> str:
         raise ValueError(f"could not read goal file: {goal_file}") from exc
 
 
+def print_config(as_json: bool) -> int:
+    defaults = TaskConfig(goal="<required at runtime>")
+    payload = defaults.to_dict()
+    if as_json:
+        print(json.dumps(payload, indent=2))
+        return 0
+
+    print("Pair workflow defaults:")
+    print(f"- mode: {payload['mode']}")
+    print(f"- max_rounds: {payload['max_rounds']}")
+    print(f"- developer_model: {payload['developer_model'] or '-'}")
+    print(f"- reviewer_model: {payload['reviewer_model'] or '-'}")
+    print(f"- test_command: {payload['test_command'] or '-'}")
+    print(f"- reviewer_retry_limit: {payload['reviewer_retry_limit']}")
+    print(f"- protocol_version: {payload['protocol_version']}")
+    print(f"- prompt_version: {payload['prompt_version']}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -324,6 +347,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "artifacts":
         return print_artifacts(paths, args.task_id, args.round_number)
+
+    if args.command == "config":
+        return print_config(args.as_json)
 
     parser.error("unknown command")
     return 2

@@ -4,7 +4,7 @@ Add a CLI command to inspect pair workflow configuration
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -37,3 +37,4 @@ Provide a read-only CLI surface for inspecting the effective pair workflow confi
 ## Notes
 
 - Child ticket of `TICK-0012-configuration-and-default-policy-management.md`.
+- The CLI now includes a read-only `config` command with text and JSON output for built-in defaults.
