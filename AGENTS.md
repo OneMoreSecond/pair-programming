@@ -81,6 +81,32 @@ After work:
 2. Update acceptance notes if needed.
 3. Link any follow-up tickets created during implementation.
 
+## Roadmap Workflow
+
+When there are unfinished tickets:
+
+1. Scan all incomplete tickets under `tickets/`.
+2. Record their priority ordering in `tickets/ROADMAP.md`.
+3. Start work from the highest active priority bucket first.
+4. Only split a large ticket after it has been selected for implementation.
+5. Complete and commit one ticket at a time.
+
+### Roadmap Priority Buckets
+
+Use these buckets in `tickets/ROADMAP.md`:
+
+- `P0`: critical workflow reliability and unblockers
+- `P1`: near-term usability and recovery improvements
+- `P2`: medium-term workflow management improvements
+- `P3`: evaluation, customization, and platform hardening
+- `P4`: advanced product capabilities and long-term expansion
+
+### Commit Rules
+
+- Each completed ticket must have its own git commit.
+- The commit message must include the ticket ID.
+- Do not bundle multiple completed tickets into one commit.
+
 ## Current Source Of Truth
 
 - Process rules: `AGENTS.md`
