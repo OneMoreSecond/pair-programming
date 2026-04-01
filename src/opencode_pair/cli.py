@@ -12,6 +12,7 @@ from .models import (
     TaskConfig,
 )
 from .paths import PairPaths
+from .preflight import run_preflight
 from .review_parser import parse_review_file
 from .workflow import advance_task, init_task, load_current_task, resume_task
 
@@ -102,6 +103,17 @@ def print_review(paths: PairPaths, round_number: int | None) -> int:
     return 0
 
 
+def print_preflight(report) -> None:
+    if report.errors:
+        print("Preflight errors:", file=sys.stderr)
+        for item in report.errors:
+            print(f"- {item}", file=sys.stderr)
+    if report.warnings:
+        print("Preflight warnings:")
+        for item in report.warnings:
+            print(f"- {item}")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -118,6 +130,10 @@ def main(argv: list[str] | None = None) -> int:
             opencode_agent=args.agent,
             dry_run=args.dry_run,
         )
+        preflight = run_preflight(paths, config)
+        print_preflight(preflight)
+        if not preflight.ok:
+            return 2
         state = init_task(paths, config)
         state = advance_task(paths, config, state)
         print(f"Task created: {state.task_id}")

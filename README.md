@@ -58,6 +58,13 @@ PYTHONPATH=src python3 -m opencode_pair start \
   --dry-run
 ```
 
+启动前会执行轻量 preflight，提前报告常见问题，例如：
+
+- prompt 模板缺失
+- `opencode` 不在 PATH 中
+- git 工作区已有未提交改动
+- 配置的测试命令可能不可执行
+
 ### 3. 查看状态和 review
 
 ```bash
@@ -124,7 +131,6 @@ PYTHONPATH=src python3 -m unittest discover -s tests -p "test_*.py"
 ## 当前限制
 
 - 仍是独立 MVP，还没有接入 `opencode pair` 官方子命令
-- `patch.diff` 目前来自快照比较，不是 git diff
 - review 解析器目前只覆盖最小协议
 - 真实运行效果依赖 `opencode` 模型行为和 prompt 稳定性
 

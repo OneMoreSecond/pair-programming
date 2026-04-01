@@ -4,7 +4,7 @@ Add preflight checks and workspace safety guards
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -40,3 +40,4 @@ Run lightweight validation before starting a task so the workflow can warn about
 ## Notes
 
 - This requirement comes primarily from `operations.md` and `ux.md`.
+- `start` now runs a lightweight preflight and reports warnings for dirty worktrees and missing test executables.
