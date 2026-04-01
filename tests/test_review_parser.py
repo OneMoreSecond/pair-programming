@@ -1,6 +1,6 @@
 import unittest
 
-from opencode_pair.review_parser import parse_review_text
+from opencode_pair.review_parser import ReviewProtocolError, parse_review_text
 
 
 class ReviewParserTests(unittest.TestCase):
@@ -47,5 +47,32 @@ Looks good.
         self.assertEqual(result.summary, "Looks good.")
 
     def test_missing_status_raises(self) -> None:
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ReviewProtocolError):
             parse_review_text("# Review Result\n\n## Blocking\n- None.\n")
+
+    def test_missing_summary_raises(self) -> None:
+        with self.assertRaises(ReviewProtocolError):
+            parse_review_text(
+                """# Review Result
+Status: APPROVED
+
+## Blocking
+- None.
+
+## Non-blocking
+- None.
+"""
+            )
+
+    def test_empty_blocking_section_raises(self) -> None:
+        with self.assertRaises(ReviewProtocolError):
+            parse_review_text(
+                """# Review Result
+Status: APPROVED
+
+## Blocking
+
+## Summary
+Looks good.
+"""
+            )

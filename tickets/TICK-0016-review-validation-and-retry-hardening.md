@@ -4,7 +4,7 @@ Harden review validation, parsing, and retry behavior
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -39,3 +39,4 @@ Strengthen the reviewer output pipeline so malformed or incomplete review files 
 ## Notes
 
 - This extends the minimal parser currently implemented in the MVP.
+- Review parsing now validates required sections more strictly and the reviewer step retries once on protocol-invalid output.

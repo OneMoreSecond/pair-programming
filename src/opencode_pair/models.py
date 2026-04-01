@@ -40,6 +40,7 @@ class RoundRecord:
     review_path: Optional[str] = None
     review_status: Optional[str] = None
     blocking_count: int = 0
+    reviewer_attempts: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -60,6 +61,7 @@ class TaskConfig:
     opencode_agent: Optional[str] = None
     protocol_version: int = 1
     prompt_version: int = 1
+    reviewer_retry_limit: int = 1
     dry_run: bool = False
 
     def to_dict(self) -> Dict[str, Any]:

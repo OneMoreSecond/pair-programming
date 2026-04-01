@@ -25,7 +25,7 @@ from .models import (
 from .paths import PairPaths
 from .patches import git_diff_text, is_git_repo, write_patch
 from .prompts import render_prompt_to_file
-from .review_parser import parse_review_file
+from .review_parser import ReviewProtocolError, parse_review_file
 from .runner import run_opencode, run_test_command
 from .storage import load_config, load_state, save_config, save_state
 from .utils import ensure_parent, relative_to, slugify_task_id, utc_now
@@ -277,44 +277,77 @@ def run_reviewer_round(paths: PairPaths, config: TaskConfig, state: TaskState) -
     state.resume_from = RESUME_REVIEWER
     save_task(paths, state)
 
-    reviewer_prompt_path = round_dir / "reviewer-input.md"
-    render_prompt_to_file(
-        paths.reviewer_template_path(),
-        reviewer_prompt_path,
-        _reviewer_context(paths, state, round_dir),
-    )
-    record.reviewer_prompt_path = relative_to(reviewer_prompt_path, paths.workdir)
-
-    reviewer_log_path = round_dir / "reviewer.log"
-    record.reviewer_log_path = relative_to(reviewer_log_path, paths.workdir)
-    result = run_opencode(
-        prompt_file=reviewer_prompt_path,
-        workdir=paths.workdir,
-        log_path=reviewer_log_path,
-        model=config.reviewer_model,
-        agent=config.opencode_agent,
-        title=f"{state.task_id} reviewer round {state.current_round}",
-        dry_run=config.dry_run,
-    )
-    if result.returncode != 0:
-        state.status = STATUS_FAILED
-        state.last_error = f"reviewer session failed with exit code {result.returncode}"
-        save_task(paths, state)
-        raise RuntimeError(state.last_error)
-
+    parsed = None
     review_path = round_dir / "review.md"
-    if not review_path.exists() and config.dry_run:
-        review_path.write_text(
-            "# Review Result\nStatus: CHANGES_REQUESTED\n\n## Blocking\n- Dry run placeholder.\n\n## Non-blocking\n- None.\n\n## Suggested Fix Plan\n1. Run without --dry-run to produce a real review.\n\n## Summary\nDry run mode generated a placeholder review.\n",
-            encoding="utf-8",
+    last_protocol_error = None
+
+    for attempt in range(1, config.reviewer_retry_limit + 2):
+        prompt_name = (
+            "reviewer-input.md"
+            if attempt == 1
+            else f"reviewer-input.retry-{attempt}.md"
         )
-    if not review_path.exists():
+        log_name = "reviewer.log" if attempt == 1 else f"reviewer.retry-{attempt}.log"
+        reviewer_prompt_path = round_dir / prompt_name
+        reviewer_log_path = round_dir / log_name
+        render_prompt_to_file(
+            paths.reviewer_template_path(),
+            reviewer_prompt_path,
+            _reviewer_context(paths, state, round_dir),
+        )
+        record.reviewer_prompt_path = relative_to(reviewer_prompt_path, paths.workdir)
+        record.reviewer_log_path = relative_to(reviewer_log_path, paths.workdir)
+        record.reviewer_attempts = attempt
+
+        result = run_opencode(
+            prompt_file=reviewer_prompt_path,
+            workdir=paths.workdir,
+            log_path=reviewer_log_path,
+            model=config.reviewer_model,
+            agent=config.opencode_agent,
+            title=f"{state.task_id} reviewer round {state.current_round} attempt {attempt}",
+            dry_run=config.dry_run,
+        )
+        if result.returncode != 0:
+            state.status = STATUS_FAILED
+            state.last_error = (
+                f"reviewer session failed with exit code {result.returncode}"
+            )
+            save_task(paths, state)
+            raise RuntimeError(state.last_error)
+
+        if not review_path.exists() and config.dry_run:
+            review_path.write_text(
+                "# Review Result\nStatus: CHANGES_REQUESTED\n\n## Blocking\n- Dry run placeholder.\n\n## Non-blocking\n- None.\n\n## Suggested Fix Plan\n1. Run without --dry-run to produce a real review.\n\n## Summary\nDry run mode generated a placeholder review.\n",
+                encoding="utf-8",
+            )
+        if not review_path.exists():
+            last_protocol_error = "reviewer did not write review.md"
+            if attempt <= config.reviewer_retry_limit:
+                continue
+            state.status = STATUS_FAILED
+            state.last_error = f"review protocol error: {last_protocol_error}"
+            save_task(paths, state)
+            raise RuntimeError(state.last_error)
+
+        try:
+            parsed = parse_review_file(review_path)
+            break
+        except ReviewProtocolError as exc:
+            last_protocol_error = str(exc)
+            if attempt <= config.reviewer_retry_limit:
+                continue
+            state.status = STATUS_FAILED
+            state.last_error = f"review protocol error: {last_protocol_error}"
+            save_task(paths, state)
+            raise RuntimeError(state.last_error) from exc
+
+    if parsed is None:
         state.status = STATUS_FAILED
-        state.last_error = "reviewer did not write review.md"
+        state.last_error = f"review protocol error: {last_protocol_error or 'unknown review parse failure'}"
         save_task(paths, state)
         raise RuntimeError(state.last_error)
 
-    parsed = parse_review_file(review_path)
     record.review_path = relative_to(review_path, paths.workdir)
     record.review_status = parsed.status
     record.blocking_count = parsed.blocking_count
