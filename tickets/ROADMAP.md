@@ -7,7 +7,6 @@ This roadmap tracks priority for all incomplete tickets.
 
 ## P1
 
-- `TICK-0006-goal-file-support.md`
 - `TICK-0008-artifacts-command.md`
 - `TICK-0009-cli-output-and-error-improvements.md`
 - `TICK-0014-advanced-status-review-and-resume-controls.md`
