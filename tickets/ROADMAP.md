@@ -16,9 +16,10 @@ This roadmap tracks priority for all incomplete tickets.
 - `TICK-0018-manual-intervention-controls-between-rounds.md`
 - `TICK-0019-task-history-browsing-and-round-replay.md`
 - `TICK-0022-tester-role-and-test-pipeline-expansion.md`
-- `TICK-0042-config-precedence-and-task-overrides.md`
 
 ## P3
+
+- `TICK-0045-distinguish-cli-defaults-from-explicit-args.md`
 
 - `TICK-0023-prompt-customization-profiles-and-versioning.md`
 - `TICK-0025-observability-metrics-and-local-reporting.md`
