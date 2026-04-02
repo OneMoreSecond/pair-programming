@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "opencode-pair"
-version = "0.1.2"
+version = "0.1.3"
 description = "MVP AI pair programming workflow on top of opencode"
 requires-python = ">=3.9"
 
