@@ -4,7 +4,7 @@ Align the command surface with the pair CLI design
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -38,3 +38,4 @@ Bring command names, help text, and user-facing examples in line with the `openc
 ## Notes
 
 - This ticket focuses on command-surface consistency after the wrapper exists.
+- Help output now supports the native-style program name, and README examples now prefer `opencode pair` while keeping `opencode-pair` documented as a compatibility path.

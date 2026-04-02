@@ -4,6 +4,10 @@ from opencode_pair.cli import build_parser, load_goal
 
 
 class CliTests(unittest.TestCase):
+    def test_parser_accepts_custom_prog_name(self) -> None:
+        parser = build_parser("opencode pair")
+        self.assertEqual(parser.prog, "opencode pair")
+
     def test_start_command_parses(self) -> None:
         parser = build_parser()
         args = parser.parse_args(["start", "--goal", "Build something"])

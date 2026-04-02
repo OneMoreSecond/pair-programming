@@ -1,6 +1,6 @@
 # Opencode Pair MVP
 
-`opencode-pair` 是一个面向终端用户的 AI pair programming 工作流原型。
+`opencode pair` 是当前推荐的命令入口；`opencode-pair` 仍然保留为兼容别名。
 
 它会在本地仓库里串行调度两个角色：
 
@@ -37,7 +37,7 @@ opencode-pair --help
 opencode pair --help
 ```
 
-当前也提供了一个过渡期的原生风格入口：`opencode pair ...` 会转发到同一套工作流逻辑。`opencode-pair` 仍然保留，避免打断已有用法。
+当前推荐优先使用 `opencode pair ...`。`opencode-pair` 会继续可用，避免打断已有脚本和习惯。
 
 如果你只是开发这个项目本身，也可以继续用模块方式运行，但这属于开发者用法，不是推荐的终端用户入口。
 
@@ -46,11 +46,11 @@ opencode pair --help
 ### 1. 先做一次 dry-run
 
 ```bash
-opencode-pair start \
+opencode pair start \
   --goal "Create a small sample artifact for the pair workflow" \
   --dry-run
 
-opencode pair start \
+opencode-pair start \
   --goal "Create a small sample artifact for the pair workflow" \
   --dry-run
 ```
@@ -58,7 +58,7 @@ opencode pair start \
 如果任务描述比较长，也可以从文件读取：
 
 ```bash
-opencode-pair start --goal-file ./task.md --dry-run
+opencode pair start --goal-file ./task.md --dry-run
 ```
 
 启动前会执行轻量 preflight，提前提示常见问题，例如：
@@ -71,9 +71,9 @@ opencode-pair start --goal-file ./task.md --dry-run
 ### 2. 查看状态和 review
 
 ```bash
-opencode-pair status
-opencode-pair review
-opencode-pair artifacts
+opencode pair status
+opencode pair review
+opencode pair artifacts
 ```
 
 如果当前没有活动任务，CLI 会直接告诉你下一步该执行什么。
@@ -81,36 +81,36 @@ opencode-pair artifacts
 更深入的查询方式：
 
 ```bash
-opencode-pair status --json
-opencode-pair status --verbose
-opencode-pair config
-opencode-pair metrics
-opencode-pair eval
-opencode-pair start --goal "Build UI" --prompt-profile frontend
-opencode-pair review --round 2
-opencode-pair artifacts --round 2
-opencode-pair history
-opencode-pair resume --from reviewer
-opencode-pair stop --reason "pause for manual review"
-opencode-pair intervene --focus-only-blocking --note "ignore non-blocking for now"
+opencode pair status --json
+opencode pair status --verbose
+opencode pair config
+opencode pair metrics
+opencode pair eval
+opencode pair start --goal "Build UI" --prompt-profile frontend
+opencode pair review --round 2
+opencode pair artifacts --round 2
+opencode pair history
+opencode pair resume --from reviewer
+opencode pair stop --reason "pause for manual review"
+opencode pair intervene --focus-only-blocking --note "ignore non-blocking for now"
 ```
 
 如果你想在 round 之间人工介入，可以：
 
 - 先手动编辑当前 `review.md`
-- 或者用 `opencode-pair intervene` 调整下一轮策略
-- 然后再执行 `opencode-pair resume`
+- 或者用 `opencode pair intervene` 调整下一轮策略
+- 然后再执行 `opencode pair resume`
 
 ### 3. 继续下一轮
 
 ```bash
-opencode-pair resume
+opencode pair resume
 ```
 
 ## 真实运行示例
 
 ```bash
-opencode-pair start \
+opencode pair start \
   --goal "Add a small markdown file documenting the pair workflow" \
   --mode semi_auto
 ```
@@ -162,8 +162,8 @@ opencode-pair start \
 然后可以用下面命令查看当前生效的项目默认值：
 
 ```bash
-opencode-pair config
-opencode-pair config --json
+opencode pair config
+opencode pair config --json
 ```
 
 配置优先级为：
@@ -177,12 +177,12 @@ CLI flags > task config > project config > built-in defaults
 可以用 `eval` 子命令快速检查真实任务样例是否仍然满足基础结构要求，作为 prompt 或工作流变更后的轻量回归信号：
 
 ```bash
-opencode-pair eval
-opencode-pair eval --task-file examples/basic-task.md --task-file examples/real-run-artifact.md
-opencode-pair eval --json
+opencode pair eval
+opencode pair eval --task-file examples/basic-task.md --task-file examples/real-run-artifact.md
+opencode pair eval --json
 ```
 
-默认会检查 `examples/basic-task.md`。当前会输出每个任务文件是否存在、是否包含 `Goal:`、是否包含 `Constraints:`、总行数，以及 warning/error 信号。
+默认会检查 `examples/basic-task.md`。当前会输出每个任务文件是否存在、是否包含 `Goal:`、是否包含 `Constraints:`、总行数，以及 warning/error 信号。兼容入口 `opencode-pair eval` 也仍然可用。
 
 ## 运行后会生成什么
 
@@ -207,13 +207,13 @@ opencode-pair eval --json
 如果你想快速列出当前 round 的这些文件：
 
 ```bash
-opencode-pair artifacts
-opencode-pair artifacts --round 2
+opencode pair artifacts
+opencode pair artifacts --round 2
 ```
 
 ## 当前限制
 
-- 还不是原生 `opencode pair` 子命令
+- 当前原生入口仍是项目内 wrapper，而不是上游 `opencode` 官方内建子命令
 - review 协议和恢复策略还在持续增强
 - 更复杂的多轮真实代码任务还需要更多回归验证
 

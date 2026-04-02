@@ -20,4 +20,6 @@ class OpencodeWrapperTests(unittest.TestCase):
         ) as mock_main:
             code = main(["pair", "status", "--json"])
         self.assertEqual(code, 7)
-        mock_main.assert_called_once_with(["status", "--json"])
+        mock_main.assert_called_once_with(
+            ["status", "--json"], prog_name="opencode pair"
+        )

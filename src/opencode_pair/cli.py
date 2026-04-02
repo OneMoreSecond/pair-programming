@@ -31,9 +31,9 @@ from .workflow import (
 )
 
 
-def build_parser() -> argparse.ArgumentParser:
+def build_parser(prog_name: str = "opencode-pair") -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="opencode-pair", description="MVP pair programming orchestrator"
+        prog=prog_name, description="MVP pair programming orchestrator"
     )
     parser.add_argument("--workdir", default=".", help="repository root to run in")
 
@@ -555,8 +555,8 @@ def print_config(paths: PairPaths, as_json: bool) -> int:
     return 0
 
 
-def main(argv: list[str] | None = None) -> int:
-    parser = build_parser()
+def main(argv: list[str] | None = None, prog_name: str = "opencode-pair") -> int:
+    parser = build_parser(prog_name=prog_name)
     args = parser.parse_args(argv)
     paths = PairPaths(Path(args.workdir))
 

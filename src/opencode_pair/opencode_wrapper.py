@@ -13,7 +13,7 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 2
-    return pair_main(args[1:])
+    return pair_main(args[1:], prog_name="opencode pair")
 
 
 if __name__ == "__main__":
