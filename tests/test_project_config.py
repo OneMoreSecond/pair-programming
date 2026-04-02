@@ -21,17 +21,22 @@ class ProjectConfigTests(unittest.TestCase):
             payload = build_effective_defaults(paths)
             self.assertEqual(payload["mode"], "semi_auto")
             self.assertEqual(payload["max_rounds"], 3)
+            self.assertEqual(payload["prompt_profile"], "default")
 
     def test_project_config_overrides_defaults(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             paths = PairPaths(Path(tmp))
             paths.ensure_root()
             paths.project_config_path().write_text(
-                json.dumps({"mode": "auto", "max_rounds": 5}), encoding="utf-8"
+                json.dumps(
+                    {"mode": "auto", "max_rounds": 5, "prompt_profile": "frontend"}
+                ),
+                encoding="utf-8",
             )
             payload = build_effective_defaults(paths)
             self.assertEqual(payload["mode"], "auto")
             self.assertEqual(payload["max_rounds"], 5)
+            self.assertEqual(payload["prompt_profile"], "frontend")
 
     def test_print_config_reports_project_config_presence(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -56,6 +61,7 @@ class ProjectConfigTests(unittest.TestCase):
             args = SimpleNamespace(
                 developer_model=None,
                 reviewer_model=None,
+                prompt_profile=None,
                 max_rounds=2,
                 mode="semi_auto",
                 test_command=None,
@@ -78,6 +84,7 @@ class ProjectConfigTests(unittest.TestCase):
             args = SimpleNamespace(
                 developer_model=None,
                 reviewer_model=None,
+                prompt_profile=None,
                 max_rounds=None,
                 mode=None,
                 test_command=None,
@@ -86,3 +93,24 @@ class ProjectConfigTests(unittest.TestCase):
             )
             config = build_task_config_from_args(paths, args, "Goal")
             self.assertEqual(config.mode, "auto")
+
+    def test_cli_prompt_profile_overrides_project_default(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = PairPaths(Path(tmp))
+            paths.ensure_root()
+            paths.project_config_path().write_text(
+                json.dumps({"prompt_profile": "frontend"}),
+                encoding="utf-8",
+            )
+            args = SimpleNamespace(
+                developer_model=None,
+                reviewer_model=None,
+                prompt_profile="backend",
+                max_rounds=None,
+                mode=None,
+                test_command=None,
+                agent=None,
+                dry_run=None,
+            )
+            config = build_task_config_from_args(paths, args, "Goal")
+            self.assertEqual(config.prompt_profile, "backend")

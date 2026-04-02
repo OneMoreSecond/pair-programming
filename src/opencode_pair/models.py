@@ -56,6 +56,7 @@ class RoundRecord:
 @dataclass
 class TaskConfig:
     goal: str
+    prompt_profile: str = "default"
     developer_model: Optional[str] = None
     reviewer_model: Optional[str] = None
     max_rounds: int = 3

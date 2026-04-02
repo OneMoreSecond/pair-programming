@@ -45,19 +45,21 @@ def default_focus_for_round(
     return "make the smallest changes needed to move the task forward"
 
 
-def ensure_prompt_templates(paths: PairPaths) -> None:
+def ensure_prompt_templates(paths: PairPaths, config: TaskConfig) -> None:
     paths.ensure_root()
     missing = []
-    if not paths.developer_template_path().exists():
-        missing.append(str(paths.developer_template_path()))
-    if not paths.reviewer_template_path().exists():
-        missing.append(str(paths.reviewer_template_path()))
+    developer_template = paths.resolved_developer_template_path(config.prompt_profile)
+    reviewer_template = paths.resolved_reviewer_template_path(config.prompt_profile)
+    if not developer_template.exists():
+        missing.append(str(developer_template))
+    if not reviewer_template.exists():
+        missing.append(str(reviewer_template))
     if missing:
         raise FileNotFoundError("missing prompt templates: " + ", ".join(missing))
 
 
 def init_task(paths: PairPaths, config: TaskConfig) -> TaskState:
-    ensure_prompt_templates(paths)
+    ensure_prompt_templates(paths, config)
     task_id = slugify_task_id()
     rounds_dir = paths.rounds_dir(task_id)
     rounds_dir.mkdir(parents=True, exist_ok=True)
@@ -276,7 +278,7 @@ def run_developer_round(paths: PairPaths, config: TaskConfig, state: TaskState) 
 
     developer_prompt_path = round_dir / "developer-input.md"
     render_prompt_to_file(
-        paths.developer_template_path(),
+        paths.resolved_developer_template_path(config.prompt_profile),
         developer_prompt_path,
         _developer_context(paths, config, state, round_dir),
     )
@@ -370,7 +372,7 @@ def run_reviewer_round(paths: PairPaths, config: TaskConfig, state: TaskState) -
         reviewer_prompt_path = round_dir / prompt_name
         reviewer_log_path = round_dir / log_name
         render_prompt_to_file(
-            paths.reviewer_template_path(),
+            paths.resolved_reviewer_template_path(config.prompt_profile),
             reviewer_prompt_path,
             _reviewer_context(paths, state, round_dir),
         )

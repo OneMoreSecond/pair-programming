@@ -48,6 +48,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     start.add_argument("--developer-model", default=None)
     start.add_argument("--reviewer-model", default=None)
+    start.add_argument("--prompt-profile", default=None)
     start.add_argument("--test-command", default=None)
     start.add_argument("--agent", default=None)
     start.add_argument("--max-rounds", type=int, default=None)
@@ -382,6 +383,7 @@ def build_effective_defaults(paths: PairPaths) -> dict:
     for key in [
         "developer_model",
         "reviewer_model",
+        "prompt_profile",
         "max_rounds",
         "mode",
         "test_command",
@@ -400,6 +402,9 @@ def build_task_config_from_args(paths: PairPaths, args, goal_text: str) -> TaskC
     defaults = build_effective_defaults(paths)
     return TaskConfig(
         goal=goal_text,
+        prompt_profile=args.prompt_profile
+        if args.prompt_profile is not None
+        else defaults["prompt_profile"],
         developer_model=args.developer_model
         if args.developer_model is not None
         else defaults["developer_model"],
@@ -434,6 +439,7 @@ def print_config(paths: PairPaths, as_json: bool) -> int:
 
     print("Pair workflow defaults:")
     print(f"- mode: {payload['mode']}")
+    print(f"- prompt_profile: {payload['prompt_profile']}")
     print(f"- max_rounds: {payload['max_rounds']}")
     print(f"- developer_model: {payload['developer_model'] or '-'}")
     print(f"- reviewer_model: {payload['reviewer_model'] or '-'}")

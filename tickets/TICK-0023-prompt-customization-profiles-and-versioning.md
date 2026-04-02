@@ -4,7 +4,7 @@ Add prompt customization, project profiles, and version management
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -39,3 +39,4 @@ Allow the workflow to evolve prompts safely across projects by supporting versio
 ## Notes
 
 - This requirement grows out of `prompts.md` and `protocol.md`.
+- Prompt configuration now supports explicit `prompt_profile`, project-level profile defaults, profile-specific template overrides, and tracked prompt versions in config/state.

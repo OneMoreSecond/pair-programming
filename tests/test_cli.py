@@ -89,6 +89,14 @@ class CliTests(unittest.TestCase):
         self.assertTrue(args.as_json)
         self.assertEqual(args.task_id, "pair-1")
 
+    def test_prompt_profile_parses(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(
+            ["start", "--goal", "Build", "--prompt-profile", "frontend"]
+        )
+        self.assertEqual(args.command, "start")
+        self.assertEqual(args.prompt_profile, "frontend")
+
     def test_goal_file_argument_parses(self) -> None:
         parser = build_parser()
         args = parser.parse_args(["start", "--goal-file", "task.md"])

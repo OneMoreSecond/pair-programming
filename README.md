@@ -78,6 +78,7 @@ opencode-pair status --json
 opencode-pair status --verbose
 opencode-pair config
 opencode-pair metrics
+opencode-pair start --goal "Build UI" --prompt-profile frontend
 opencode-pair review --round 2
 opencode-pair artifacts --round 2
 opencode-pair history
@@ -131,8 +132,23 @@ opencode-pair start \
 {
   "mode": "auto",
   "max_rounds": 5,
+  "prompt_profile": "frontend",
   "test_command": "python3 -m unittest discover -s tests -p \"test_*.py\""
 }
+```
+
+如果仓库里存在 profile 提示模板，也会自动使用，例如：
+
+```text
+.opencode/pair/prompts/frontend/developer.md
+.opencode/pair/prompts/frontend/reviewer.md
+```
+
+如果选中的 profile 模板不存在，系统会回退到默认模板：
+
+```text
+.opencode/pair/prompts/developer.md
+.opencode/pair/prompts/reviewer.md
 ```
 
 然后可以用下面命令查看当前生效的项目默认值：

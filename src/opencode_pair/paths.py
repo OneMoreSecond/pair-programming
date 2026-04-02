@@ -41,5 +41,22 @@ class PairPaths:
     def reviewer_template_path(self) -> Path:
         return self.prompts_dir / "reviewer.md"
 
+    def prompt_profile_dir(self, profile: str) -> Path:
+        return self.prompts_dir / profile
+
+    def resolved_developer_template_path(self, profile: str) -> Path:
+        if profile != "default":
+            candidate = self.prompt_profile_dir(profile) / "developer.md"
+            if candidate.exists():
+                return candidate
+        return self.developer_template_path()
+
+    def resolved_reviewer_template_path(self, profile: str) -> Path:
+        if profile != "default":
+            candidate = self.prompt_profile_dir(profile) / "reviewer.md"
+            if candidate.exists():
+                return candidate
+        return self.reviewer_template_path()
+
     def project_config_path(self) -> Path:
         return self.project_config_file
