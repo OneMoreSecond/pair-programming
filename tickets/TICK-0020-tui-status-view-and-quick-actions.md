@@ -38,3 +38,7 @@ Add a terminal UI layer that makes task state, latest artifacts, and next-step a
 ## Notes
 
 - This ticket comes from the UX and operations design docs.
+- Child tickets:
+  - `TICK-0066-add-tui-status-summary-view.md`
+  - `TICK-0067-add-tui-artifact-and-history-panels.md`
+  - `TICK-0068-add-tui-quick-actions.md`
