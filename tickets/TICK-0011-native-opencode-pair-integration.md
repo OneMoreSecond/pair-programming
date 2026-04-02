@@ -38,3 +38,7 @@ Move the MVP from a standalone Python CLI shape toward the intended `opencode pa
 ## Notes
 
 - The current MVP still runs as `python -m opencode_pair` / `opencode-pair`.
+- Child tickets:
+  - `TICK-0059-add-opencode-pair-command-wrapper.md`
+  - `TICK-0060-align-command-surface-with-pair-cli-design.md`
+  - `TICK-0061-validate-native-integration-compatibility.md`

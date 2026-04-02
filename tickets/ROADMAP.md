@@ -18,7 +18,9 @@ This roadmap tracks priority for all incomplete tickets.
 
 ## P4
 
-- `TICK-0011-native-opencode-pair-integration.md`
+- `TICK-0059-add-opencode-pair-command-wrapper.md`
+- `TICK-0060-align-command-surface-with-pair-cli-design.md`
+- `TICK-0061-validate-native-integration-compatibility.md`
 - `TICK-0020-tui-status-view-and-quick-actions.md`
 - `TICK-0021-multi-reviewer-support-and-result-aggregation.md`
 - `TICK-0024-structured-review-export-and-protocol-evolution.md`
