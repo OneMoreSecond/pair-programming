@@ -77,6 +77,7 @@ opencode-pair artifacts
 opencode-pair status --json
 opencode-pair status --verbose
 opencode-pair config
+opencode-pair metrics
 opencode-pair review --round 2
 opencode-pair artifacts --round 2
 opencode-pair history

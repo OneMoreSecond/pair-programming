@@ -4,7 +4,7 @@ Add observability, metrics, and local reporting for pair tasks
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -39,3 +39,4 @@ Track workflow performance and reliability with task-level metrics and local rep
 ## Notes
 
 - This requirement is rooted in `operations.md` and `state.md`.
+- The CLI now includes a local `metrics` command that summarizes rounds, blocker counts, reviewer attempts, and intervention patterns from task state.

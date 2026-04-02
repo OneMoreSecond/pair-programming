@@ -82,6 +82,13 @@ class CliTests(unittest.TestCase):
         self.assertTrue(args.as_json)
         self.assertEqual(args.task_id, "pair-1")
 
+    def test_metrics_json_parses(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["metrics", "--json", "--task-id", "pair-1"])
+        self.assertEqual(args.command, "metrics")
+        self.assertTrue(args.as_json)
+        self.assertEqual(args.task_id, "pair-1")
+
     def test_goal_file_argument_parses(self) -> None:
         parser = build_parser()
         args = parser.parse_args(["start", "--goal-file", "task.md"])

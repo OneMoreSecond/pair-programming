@@ -109,6 +109,11 @@ def build_parser() -> argparse.ArgumentParser:
     config_cmd.add_argument("--workdir", default=".", help="repository root to run in")
     config_cmd.add_argument("--json", action="store_true", dest="as_json")
 
+    metrics = subparsers.add_parser("metrics", help="show local workflow metrics")
+    metrics.add_argument("--workdir", default=".", help="repository root to run in")
+    metrics.add_argument("--task-id", default=None, help="inspect a specific task")
+    metrics.add_argument("--json", action="store_true", dest="as_json")
+
     return parser
 
 
@@ -296,6 +301,52 @@ def print_history(
             print(f"  patch: {record.patch_path}")
         if record.review_path:
             print(f"  review: {record.review_path}")
+    return 0
+
+
+def print_metrics(
+    paths: PairPaths, task_id: str | None = None, as_json: bool = False
+) -> int:
+    try:
+        _, state = _load_state_for_query(paths, task_id)
+    except FileNotFoundError:
+        print("No active task found.", file=sys.stderr)
+        print('Next action: run `opencode-pair start --goal "..."`', file=sys.stderr)
+        return 1
+
+    rounds = state.rounds
+    payload = {
+        "task_id": state.task_id,
+        "status": state.status,
+        "round_count": len(rounds),
+        "current_round": state.current_round,
+        "approved_rounds": sum(1 for r in rounds if r.review_status == "APPROVED"),
+        "changes_requested_rounds": sum(
+            1 for r in rounds if r.review_status == "CHANGES_REQUESTED"
+        ),
+        "max_blocking_count": max((r.blocking_count for r in rounds), default=0),
+        "latest_blocking_count": rounds[-1].blocking_count if rounds else 0,
+        "reviewer_attempts_total": sum(r.reviewer_attempts for r in rounds),
+        "intervention_count": state.intervention_count,
+        "has_failures": bool(state.last_error),
+        "has_warnings": bool(state.last_warning),
+    }
+
+    if as_json:
+        print(json.dumps(payload, indent=2))
+        return 0
+
+    print(f"Task: {payload['task_id']}")
+    print(f"Status: {payload['status']}")
+    print(f"Round count: {payload['round_count']}")
+    print(f"Approved rounds: {payload['approved_rounds']}")
+    print(f"Changes requested rounds: {payload['changes_requested_rounds']}")
+    print(f"Max blocking count: {payload['max_blocking_count']}")
+    print(f"Latest blocking count: {payload['latest_blocking_count']}")
+    print(f"Reviewer attempts total: {payload['reviewer_attempts_total']}")
+    print(f"Intervention count: {payload['intervention_count']}")
+    print(f"Has failures: {payload['has_failures']}")
+    print(f"Has warnings: {payload['has_warnings']}")
     return 0
 
 
@@ -503,6 +554,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "config":
         return print_config(paths, args.as_json)
+
+    if args.command == "metrics":
+        return print_metrics(paths, args.task_id, args.as_json)
 
     parser.error("unknown command")
     return 2
