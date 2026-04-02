@@ -4,7 +4,7 @@ Introduce a tester role and expand test pipeline capabilities
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -38,3 +38,4 @@ Grow the workflow beyond ad hoc test command execution by introducing a clearer 
 ## Notes
 
 - This requirement appears in the architecture and advanced rollout phases.
+- The workflow now has an explicit tester-phase artifact (`tester-note.md`) and passes tester context into review.

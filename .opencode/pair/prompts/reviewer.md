@@ -24,6 +24,9 @@ Rules:
 # Test Summary
 {{test_summary_section}}
 
+# Tester Note
+{{tester_note_section}}
+
 # Patch Diff Path
 `{{patch_path}}`
 

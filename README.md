@@ -161,6 +161,7 @@ CLI flags > task config > project config > built-in defaults
 - `developer.log`
 - `developer-note.md`
 - `patch.diff`
+- `tester-note.md`
 - `test.log` / `test-summary.md`
 - `reviewer-input.md`
 - `reviewer.log`

@@ -35,6 +35,7 @@ class RoundRecord:
     patch_path: Optional[str] = None
     test_summary_path: Optional[str] = None
     test_log_path: Optional[str] = None
+    tester_note_path: Optional[str] = None
     reviewer_prompt_path: Optional[str] = None
     reviewer_log_path: Optional[str] = None
     review_path: Optional[str] = None

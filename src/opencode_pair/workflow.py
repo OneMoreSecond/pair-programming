@@ -194,6 +194,22 @@ def write_test_summary(
     )
 
 
+def write_tester_note(path: Path, command_text: str, returncode: int) -> None:
+    result = "PASSED" if returncode == 0 else "FAILED"
+    path.write_text(
+        "# Tester Note\n\n"
+        "## Role\n"
+        "The tester phase validates the current round before review.\n\n"
+        "## Command\n"
+        f"{command_text}\n\n"
+        "## Result\n"
+        f"{result}\n\n"
+        "## Notes For Reviewer\n"
+        "- Review the test summary together with the patch and developer note.\n",
+        encoding="utf-8",
+    )
+
+
 def _developer_context(
     paths: PairPaths, config: TaskConfig, state: TaskState, round_dir: Path
 ) -> dict[str, str]:
@@ -225,12 +241,17 @@ def _reviewer_context(
     paths: PairPaths, state: TaskState, round_dir: Path
 ) -> dict[str, str]:
     test_summary_path = round_dir / "test-summary.md"
+    tester_note_path = round_dir / "tester-note.md"
     if test_summary_path.exists():
         test_summary_section = (
             f"Read `{relative_to(test_summary_path, paths.workdir)}` before reviewing."
         )
     else:
         test_summary_section = "No test summary is available for this round."
+    if tester_note_path.exists():
+        tester_note_section = f"Read `{relative_to(tester_note_path, paths.workdir)}` for tester-phase context."
+    else:
+        tester_note_section = "No tester note is available for this round."
     return {
         "goal": state.goal,
         "workdir": str(paths.workdir),
@@ -238,6 +259,7 @@ def _reviewer_context(
             round_dir / "developer-note.md", paths.workdir
         ),
         "test_summary_section": test_summary_section,
+        "tester_note_section": tester_note_section,
         "patch_path": relative_to(round_dir / "patch.diff", paths.workdir),
         "review_path": relative_to(round_dir / "review.md", paths.workdir),
     }
@@ -315,6 +337,9 @@ def run_tests(paths: PairPaths, config: TaskConfig, state: TaskState) -> None:
     result = run_test_command(
         config.test_command, paths.workdir, test_log_path, dry_run=config.dry_run
     )
+    tester_note_path = round_dir / "tester-note.md"
+    record.tester_note_path = relative_to(tester_note_path, paths.workdir)
+    write_tester_note(tester_note_path, config.test_command, result.returncode)
     test_summary_path = round_dir / "test-summary.md"
     record.test_summary_path = relative_to(test_summary_path, paths.workdir)
     write_test_summary(
