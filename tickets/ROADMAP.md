@@ -15,7 +15,6 @@ This roadmap tracks priority for all incomplete tickets.
 
 ## P3
 
-- `TICK-0023-prompt-customization-profiles-and-versioning.md`
 - `TICK-0026-real-task-regression-and-prompt-evaluation-harness.md`
 
 ## P4
