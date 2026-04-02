@@ -34,7 +34,10 @@ python3 -m pip install -e .
 
 ```bash
 opencode-pair --help
+opencode pair --help
 ```
+
+当前也提供了一个过渡期的原生风格入口：`opencode pair ...` 会转发到同一套工作流逻辑。`opencode-pair` 仍然保留，避免打断已有用法。
 
 如果你只是开发这个项目本身，也可以继续用模块方式运行，但这属于开发者用法，不是推荐的终端用户入口。
 
@@ -44,6 +47,10 @@ opencode-pair --help
 
 ```bash
 opencode-pair start \
+  --goal "Create a small sample artifact for the pair workflow" \
+  --dry-run
+
+opencode pair start \
   --goal "Create a small sample artifact for the pair workflow" \
   --dry-run
 ```
