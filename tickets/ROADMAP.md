@@ -11,7 +11,7 @@ This roadmap tracks priority for all incomplete tickets.
 
 ## P2
 
-- `TICK-0022-tester-role-and-test-pipeline-expansion.md`
+
 
 ## P3
 
