@@ -57,12 +57,32 @@ class ProjectConfigTests(unittest.TestCase):
                 developer_model=None,
                 reviewer_model=None,
                 max_rounds=2,
-                mode="auto",
+                mode="semi_auto",
                 test_command=None,
                 agent=None,
-                dry_run=False,
+                dry_run=None,
             )
             config = build_task_config_from_args(paths, args, "Goal")
             self.assertEqual(config.max_rounds, 2)
-            self.assertEqual(config.mode, "auto")
+            self.assertEqual(config.mode, "semi_auto")
             self.assertEqual(config.test_command, "pytest -q")
+
+    def test_omitted_mode_keeps_project_default(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = PairPaths(Path(tmp))
+            paths.ensure_root()
+            paths.project_config_path().write_text(
+                json.dumps({"mode": "auto"}),
+                encoding="utf-8",
+            )
+            args = SimpleNamespace(
+                developer_model=None,
+                reviewer_model=None,
+                max_rounds=None,
+                mode=None,
+                test_command=None,
+                agent=None,
+                dry_run=None,
+            )
+            config = build_task_config_from_args(paths, args, "Goal")
+            self.assertEqual(config.mode, "auto")

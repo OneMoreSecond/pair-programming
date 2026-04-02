@@ -4,7 +4,7 @@ Distinguish CLI defaults from explicit user arguments
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -37,3 +37,4 @@ Separate argparse defaults from explicit user input so config precedence can rel
 ## Notes
 
 - This was discovered while implementing `TICK-0042-config-precedence-and-task-overrides.md`.
+- The `start` command now preserves omitted values as `None`, allowing config precedence to distinguish project defaults from explicit CLI overrides.

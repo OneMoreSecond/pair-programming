@@ -50,11 +50,9 @@ def build_parser() -> argparse.ArgumentParser:
     start.add_argument("--reviewer-model", default=None)
     start.add_argument("--test-command", default=None)
     start.add_argument("--agent", default=None)
-    start.add_argument("--max-rounds", type=int, default=3)
-    start.add_argument(
-        "--mode", choices=[MODE_AUTO, MODE_SEMI_AUTO], default=MODE_SEMI_AUTO
-    )
-    start.add_argument("--dry-run", action="store_true")
+    start.add_argument("--max-rounds", type=int, default=None)
+    start.add_argument("--mode", choices=[MODE_AUTO, MODE_SEMI_AUTO], default=None)
+    start.add_argument("--dry-run", action="store_true", default=None)
 
     status = subparsers.add_parser("status", help="show current task status")
     status.add_argument("--workdir", default=".", help="repository root to run in")
@@ -357,8 +355,10 @@ def build_task_config_from_args(paths: PairPaths, args, goal_text: str) -> TaskC
         reviewer_model=args.reviewer_model
         if args.reviewer_model is not None
         else defaults["reviewer_model"],
-        max_rounds=args.max_rounds if args.max_rounds != 3 else defaults["max_rounds"],
-        mode=args.mode if args.mode != MODE_SEMI_AUTO else defaults["mode"],
+        max_rounds=args.max_rounds
+        if args.max_rounds is not None
+        else defaults["max_rounds"],
+        mode=args.mode if args.mode is not None else defaults["mode"],
         test_command=args.test_command
         if args.test_command is not None
         else defaults["test_command"],
@@ -368,7 +368,8 @@ def build_task_config_from_args(paths: PairPaths, args, goal_text: str) -> TaskC
         protocol_version=defaults["protocol_version"],
         prompt_version=defaults["prompt_version"],
         reviewer_retry_limit=defaults["reviewer_retry_limit"],
-        dry_run=args.dry_run if args.dry_run else defaults["dry_run"],
+        focus_only_blocking=defaults["focus_only_blocking"],
+        dry_run=args.dry_run if args.dry_run is not None else defaults["dry_run"],
     )
 
 
