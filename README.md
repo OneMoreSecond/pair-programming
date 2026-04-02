@@ -78,6 +78,7 @@ opencode-pair status --json
 opencode-pair status --verbose
 opencode-pair config
 opencode-pair metrics
+opencode-pair eval
 opencode-pair start --goal "Build UI" --prompt-profile frontend
 opencode-pair review --round 2
 opencode-pair artifacts --round 2
@@ -163,6 +164,18 @@ opencode-pair config --json
 ```text
 CLI flags > task config > project config > built-in defaults
 ```
+
+## 回归评估
+
+可以用 `eval` 子命令快速检查真实任务样例是否仍然满足基础结构要求，作为 prompt 或工作流变更后的轻量回归信号：
+
+```bash
+opencode-pair eval
+opencode-pair eval --task-file examples/basic-task.md --task-file examples/real-run-artifact.md
+opencode-pair eval --json
+```
+
+默认会检查 `examples/basic-task.md`。当前会输出每个任务文件是否存在、是否包含 `Goal:`、是否包含 `Constraints:`、总行数，以及 warning/error 信号。
 
 ## 运行后会生成什么
 

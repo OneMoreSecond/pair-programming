@@ -4,7 +4,7 @@ Build a real-task regression and prompt evaluation harness
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -38,3 +38,5 @@ Create a repeatable way to run representative real tasks against the workflow so
 ## Notes
 
 - This follows directly from the design guidance to validate each phase with real tasks.
+- Implemented via an `eval` CLI command that checks representative task files for baseline structural signals.
+- Default evaluation target is `examples/basic-task.md`, with support for repeated `--task-file` inputs and JSON output.

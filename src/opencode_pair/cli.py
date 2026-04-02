@@ -115,6 +115,19 @@ def build_parser() -> argparse.ArgumentParser:
     metrics.add_argument("--task-id", default=None, help="inspect a specific task")
     metrics.add_argument("--json", action="store_true", dest="as_json")
 
+    eval_cmd = subparsers.add_parser(
+        "eval", help="evaluate task files for regression signals"
+    )
+    eval_cmd.add_argument("--workdir", default=".", help="repository root to run in")
+    eval_cmd.add_argument(
+        "--task-file",
+        action="append",
+        default=None,
+        dest="task_files",
+        help="task file to evaluate; repeat to check multiple files",
+    )
+    eval_cmd.add_argument("--json", action="store_true", dest="as_json")
+
     return parser
 
 
@@ -351,6 +364,96 @@ def print_metrics(
     return 0
 
 
+def resolve_eval_task_files(
+    paths: PairPaths, task_files: list[str] | None
+) -> list[Path]:
+    if not task_files:
+        return [paths.workdir / "examples" / "basic-task.md"]
+
+    resolved = []
+    for item in task_files:
+        path = Path(item)
+        if not path.is_absolute():
+            path = paths.workdir / path
+        resolved.append(path)
+    return resolved
+
+
+def evaluate_task_file(task_file: Path) -> dict:
+    payload = {
+        "task_file": str(task_file),
+        "exists": False,
+        "has_goal": False,
+        "has_constraints": False,
+        "line_count": 0,
+        "status": "error",
+        "signals": [],
+    }
+
+    if not task_file.exists():
+        payload["signals"].append("file_not_found")
+        return payload
+
+    payload["exists"] = True
+    try:
+        text = task_file.read_text(encoding="utf-8")
+    except OSError as exc:
+        payload["signals"].append(f"read_error:{exc.__class__.__name__}")
+        return payload
+
+    lines = text.splitlines()
+    normalized = {line.strip().lower() for line in lines}
+    payload["has_goal"] = "goal:" in normalized
+    payload["has_constraints"] = "constraints:" in normalized
+    payload["line_count"] = len(lines)
+
+    if not payload["has_goal"]:
+        payload["signals"].append("missing_goal_section")
+    if not payload["has_constraints"]:
+        payload["signals"].append("missing_constraints_section")
+    if payload["line_count"] < 5:
+        payload["signals"].append("task_too_short")
+
+    payload["status"] = "ok" if not payload["signals"] else "warning"
+    return payload
+
+
+def evaluate_task_files(paths: PairPaths, task_files: list[str] | None) -> dict:
+    results = [
+        evaluate_task_file(task_file)
+        for task_file in resolve_eval_task_files(paths, task_files)
+    ]
+    return {
+        "task_count": len(results),
+        "ok_count": sum(1 for item in results if item["status"] == "ok"),
+        "warning_count": sum(1 for item in results if item["status"] == "warning"),
+        "error_count": sum(1 for item in results if item["status"] == "error"),
+        "tasks": results,
+    }
+
+
+def print_eval(paths: PairPaths, task_files: list[str] | None, as_json: bool) -> int:
+    payload = evaluate_task_files(paths, task_files)
+    if as_json:
+        print(json.dumps(payload, indent=2))
+        return 0
+
+    print(f"Evaluation cases: {payload['task_count']}")
+    print(f"OK: {payload['ok_count']}")
+    print(f"Warnings: {payload['warning_count']}")
+    print(f"Errors: {payload['error_count']}")
+    for item in payload["tasks"]:
+        print(
+            "- "
+            f"{item['task_file']}: status={item['status']}, exists={item['exists']}, "
+            f"goal={item['has_goal']}, constraints={item['has_constraints']}, "
+            f"lines={item['line_count']}"
+        )
+        if item["signals"]:
+            print(f"  signals: {', '.join(item['signals'])}")
+    return 0
+
+
 def print_preflight(report) -> None:
     if report.errors:
         print("Preflight errors:", file=sys.stderr)
@@ -563,6 +666,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "metrics":
         return print_metrics(paths, args.task_id, args.as_json)
+
+    if args.command == "eval":
+        return print_eval(paths, args.task_files, args.as_json)
 
     parser.error("unknown command")
     return 2
