@@ -4,7 +4,7 @@ Support manual intervention controls between workflow rounds
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -39,3 +39,4 @@ Allow users to pause between rounds and intentionally influence the next step, s
 ## Notes
 
 - This groups together the user intervention needs called out in `ux.md` and `workflow.md`.
+- The workflow now supports explicit `intervene` controls for blocker-only focus, model changes, round-limit updates, and recorded intervention notes between rounds.

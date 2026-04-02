@@ -58,6 +58,23 @@ class CliTests(unittest.TestCase):
         self.assertEqual(args.command, "stop")
         self.assertEqual(args.reason, "user requested stop")
 
+    def test_intervene_parses(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(
+            [
+                "intervene",
+                "--focus-only-blocking",
+                "--developer-model",
+                "model-a",
+                "--max-rounds",
+                "5",
+            ]
+        )
+        self.assertEqual(args.command, "intervene")
+        self.assertTrue(args.focus_only_blocking)
+        self.assertEqual(args.developer_model, "model-a")
+        self.assertEqual(args.max_rounds, 5)
+
     def test_goal_file_argument_parses(self) -> None:
         parser = build_parser()
         args = parser.parse_args(["start", "--goal-file", "task.md"])

@@ -32,8 +32,12 @@ from .utils import ensure_parent, relative_to, slugify_task_id, utc_now
 
 
 def default_focus_for_round(
-    round_number: int, last_review_status: Optional[str]
+    round_number: int,
+    last_review_status: Optional[str],
+    focus_only_blocking: bool = False,
 ) -> str:
+    if focus_only_blocking:
+        return "focus only on blocking issues and make the smallest safe changes"
     if round_number == 1:
         return "implement the task with minimal necessary changes"
     if last_review_status == "CHANGES_REQUESTED":
@@ -191,7 +195,7 @@ def write_test_summary(
 
 
 def _developer_context(
-    paths: PairPaths, state: TaskState, round_dir: Path
+    paths: PairPaths, config: TaskConfig, state: TaskState, round_dir: Path
 ) -> dict[str, str]:
     previous_review = "No previous review. Implement the task from scratch."
     if state.current_round > 1:
@@ -205,7 +209,11 @@ def _developer_context(
         "task_id": state.task_id,
         "round": str(state.current_round),
         "max_rounds": str(state.max_rounds),
-        "focus": default_focus_for_round(state.current_round, state.last_review_status),
+        "focus": default_focus_for_round(
+            state.current_round,
+            state.last_review_status,
+            config.focus_only_blocking,
+        ),
         "workdir": str(paths.workdir),
         "previous_review": previous_review,
         "relevant_context": "Read the repository as needed. Keep changes narrow and task-focused.",
@@ -248,7 +256,7 @@ def run_developer_round(paths: PairPaths, config: TaskConfig, state: TaskState) 
     render_prompt_to_file(
         paths.developer_template_path(),
         developer_prompt_path,
-        _developer_context(paths, state, round_dir),
+        _developer_context(paths, config, state, round_dir),
     )
     record.developer_prompt_path = relative_to(developer_prompt_path, paths.workdir)
 
@@ -488,3 +496,29 @@ def cancel_task(paths: PairPaths, reason: str | None = None) -> TaskState:
     state.cancellation_reason = reason or "cancelled by user"
     save_task(paths, state)
     return state
+
+
+def intervene_task(
+    paths: PairPaths,
+    *,
+    note: str | None = None,
+    focus_only_blocking: bool | None = None,
+    developer_model: str | None = None,
+    reviewer_model: str | None = None,
+    max_rounds: int | None = None,
+) -> tuple[TaskConfig, TaskState]:
+    config, state = load_current_task(paths)
+    if focus_only_blocking is not None:
+        config.focus_only_blocking = focus_only_blocking
+    if developer_model is not None:
+        config.developer_model = developer_model
+    if reviewer_model is not None:
+        config.reviewer_model = reviewer_model
+    if max_rounds is not None:
+        config.max_rounds = max_rounds
+        state.max_rounds = max_rounds
+    state.intervention_note = note or "manual intervention applied"
+    state.intervention_count += 1
+    save_config(paths.config_path(state.task_id), config)
+    save_task(paths, state)
+    return config, state

@@ -23,6 +23,7 @@ from .workflow import (
     advance_task,
     cancel_task,
     init_task,
+    intervene_task,
     load_current_task,
     load_task_by_id,
     resume_task,
@@ -74,6 +75,22 @@ def build_parser() -> argparse.ArgumentParser:
     stop = subparsers.add_parser("stop", help="cancel the current task")
     stop.add_argument("--workdir", default=".", help="repository root to run in")
     stop.add_argument("--reason", default=None, help="optional cancellation reason")
+
+    intervene = subparsers.add_parser(
+        "intervene", help="adjust the next round before resuming"
+    )
+    intervene.add_argument("--workdir", default=".", help="repository root to run in")
+    intervene.add_argument(
+        "--note", default=None, help="record a manual intervention note"
+    )
+    intervene.add_argument(
+        "--focus-only-blocking",
+        action="store_true",
+        help="tell the next round to focus only on blocking issues",
+    )
+    intervene.add_argument("--developer-model", default=None)
+    intervene.add_argument("--reviewer-model", default=None)
+    intervene.add_argument("--max-rounds", type=int, default=None)
 
     review = subparsers.add_parser("review", help="show latest review summary")
     review.add_argument("--workdir", default=".", help="repository root to run in")
@@ -128,6 +145,10 @@ def print_status(
         print(f"Last error: {state.last_error}")
     if state.last_warning:
         print(f"Last warning: {state.last_warning}")
+    if state.intervention_note:
+        print(f"Intervention note: {state.intervention_note}")
+    if state.intervention_count:
+        print(f"Intervention count: {state.intervention_count}")
     if state.cancelled_at:
         print(f"Cancelled at: {state.cancelled_at}")
     if state.cancellation_reason:
@@ -404,6 +425,33 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Task: {state.task_id}")
         print("Status: cancelled")
         print(f"Cancellation reason: {state.cancellation_reason}")
+        return 0
+
+    if args.command == "intervene":
+        try:
+            config, state = intervene_task(
+                paths,
+                note=args.note,
+                focus_only_blocking=True if args.focus_only_blocking else None,
+                developer_model=args.developer_model,
+                reviewer_model=args.reviewer_model,
+                max_rounds=args.max_rounds,
+            )
+        except FileNotFoundError:
+            print("No active task found.", file=sys.stderr)
+            print(
+                'Next action: run `opencode-pair start --goal "..."`', file=sys.stderr
+            )
+            return 1
+        print(f"Task: {state.task_id}")
+        print("Status: intervention recorded")
+        print(f"Intervention count: {state.intervention_count}")
+        if state.intervention_note:
+            print(f"Intervention note: {state.intervention_note}")
+        print(f"Focus only blocking: {config.focus_only_blocking}")
+        print(
+            "Next action: edit review artifacts if needed, then run `opencode-pair resume`"
+        )
         return 0
 
     if args.command == "review":

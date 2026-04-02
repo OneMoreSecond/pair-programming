@@ -64,6 +64,7 @@ class TaskConfig:
     protocol_version: int = 1
     prompt_version: int = 1
     reviewer_retry_limit: int = 1
+    focus_only_blocking: bool = False
     dry_run: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
@@ -99,6 +100,8 @@ class TaskState:
     last_error: Optional[str] = None
     last_warning: Optional[str] = None
     cancellation_reason: Optional[str] = None
+    intervention_note: Optional[str] = None
+    intervention_count: int = 0
     rounds: List[RoundRecord] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:

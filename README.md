@@ -81,7 +81,14 @@ opencode-pair review --round 2
 opencode-pair artifacts --round 2
 opencode-pair resume --from reviewer
 opencode-pair stop --reason "pause for manual review"
+opencode-pair intervene --focus-only-blocking --note "ignore non-blocking for now"
 ```
+
+如果你想在 round 之间人工介入，可以：
+
+- 先手动编辑当前 `review.md`
+- 或者用 `opencode-pair intervene` 调整下一轮策略
+- 然后再执行 `opencode-pair resume`
 
 ### 3. 继续下一轮
 
