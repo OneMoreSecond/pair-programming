@@ -4,7 +4,7 @@ Add explicit stop and cancel controls for running pair tasks
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -39,3 +39,4 @@ Provide a user-facing way to stop an active workflow and persist the task as can
 ## Notes
 
 - This requirement comes from the CLI and workflow design docs.
+- The CLI now supports `stop`, and cancelled tasks retain their artifacts and cancellation metadata.

@@ -21,6 +21,7 @@ from .review_parser import parse_review_file
 from .storage import load_optional_project_config
 from .workflow import (
     advance_task,
+    cancel_task,
     init_task,
     load_current_task,
     load_task_by_id,
@@ -69,6 +70,10 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="resume from a specific safe phase",
     )
+
+    stop = subparsers.add_parser("stop", help="cancel the current task")
+    stop.add_argument("--workdir", default=".", help="repository root to run in")
+    stop.add_argument("--reason", default=None, help="optional cancellation reason")
 
     review = subparsers.add_parser("review", help="show latest review summary")
     review.add_argument("--workdir", default=".", help="repository root to run in")
@@ -123,6 +128,10 @@ def print_status(
         print(f"Last error: {state.last_error}")
     if state.last_warning:
         print(f"Last warning: {state.last_warning}")
+    if state.cancelled_at:
+        print(f"Cancelled at: {state.cancelled_at}")
+    if state.cancellation_reason:
+        print(f"Cancellation reason: {state.cancellation_reason}")
     if state.rounds:
         latest = state.rounds[-1]
         print(
@@ -381,6 +390,20 @@ def main(argv: list[str] | None = None) -> int:
         if state.status == STATUS_WAITING_USER:
             print("Next action: inspect review or artifacts, then resume again")
             return 3
+        return 0
+
+    if args.command == "stop":
+        try:
+            state = cancel_task(paths, args.reason)
+        except FileNotFoundError:
+            print("No active task found.", file=sys.stderr)
+            print(
+                'Next action: run `opencode-pair start --goal "..."`', file=sys.stderr
+            )
+            return 1
+        print(f"Task: {state.task_id}")
+        print("Status: cancelled")
+        print(f"Cancellation reason: {state.cancellation_reason}")
         return 0
 
     if args.command == "review":

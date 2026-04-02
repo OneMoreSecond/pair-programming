@@ -93,10 +93,12 @@ class TaskState:
     created_at: str
     updated_at: str
     completed_at: Optional[str] = None
+    cancelled_at: Optional[str] = None
     last_review_status: Optional[str] = None
     resume_from: str = RESUME_DEVELOPER
     last_error: Optional[str] = None
     last_warning: Optional[str] = None
+    cancellation_reason: Optional[str] = None
     rounds: List[RoundRecord] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:

@@ -52,6 +52,12 @@ class CliTests(unittest.TestCase):
         self.assertEqual(args.command, "config")
         self.assertTrue(args.as_json)
 
+    def test_stop_reason_parses(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["stop", "--reason", "user requested stop"])
+        self.assertEqual(args.command, "stop")
+        self.assertEqual(args.reason, "user requested stop")
+
     def test_goal_file_argument_parses(self) -> None:
         parser = build_parser()
         args = parser.parse_args(["start", "--goal-file", "task.md"])

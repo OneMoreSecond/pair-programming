@@ -479,3 +479,12 @@ def resume_task_from(paths: PairPaths, from_phase: str) -> TaskState:
     state.resume_from = from_phase
     save_task(paths, state)
     return advance_task(paths, config, state)
+
+
+def cancel_task(paths: PairPaths, reason: str | None = None) -> TaskState:
+    config, state = load_current_task(paths)
+    state.status = STATUS_CANCELLED
+    state.cancelled_at = utc_now()
+    state.cancellation_reason = reason or "cancelled by user"
+    save_task(paths, state)
+    return state

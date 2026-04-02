@@ -80,6 +80,7 @@ opencode-pair config
 opencode-pair review --round 2
 opencode-pair artifacts --round 2
 opencode-pair resume --from reviewer
+opencode-pair stop --reason "pause for manual review"
 ```
 
 ### 3. 继续下一轮
