@@ -12,7 +12,6 @@ This roadmap tracks priority for all incomplete tickets.
 ## P2
 
 - `TICK-0012-configuration-and-default-policy-management.md`
-- `TICK-0013-stop-and-cancel-task-lifecycle-controls.md`
 - `TICK-0018-manual-intervention-controls-between-rounds.md`
 - `TICK-0019-task-history-browsing-and-round-replay.md`
 - `TICK-0022-tester-role-and-test-pipeline-expansion.md`
