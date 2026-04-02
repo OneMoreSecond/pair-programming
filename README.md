@@ -39,6 +39,8 @@ opencode pair --help
 
 当前推荐优先使用 `opencode pair ...`。`opencode-pair` 会继续可用，避免打断已有脚本和习惯。
 
+当前这个 `opencode pair` 入口仍然是本项目提供的兼容 wrapper，用来对齐命令形态；它还不是上游 `opencode` 官方内建的子命令。
+
 如果你只是开发这个项目本身，也可以继续用模块方式运行，但这属于开发者用法，不是推荐的终端用户入口。
 
 ## 快速开始

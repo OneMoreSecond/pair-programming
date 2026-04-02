@@ -4,7 +4,7 @@ Validate native integration compatibility with existing workflow behavior
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -38,3 +38,5 @@ Verify that the native-style integration preserves the current workflow behavior
 ## Notes
 
 - This ticket closes the loop on the preservation requirement from `TICK-0011`.
+- Added wrapper-path tests for status, artifacts, actionable review errors, and native help output.
+- Current documented compatibility caveat: `opencode pair` is still provided by this project wrapper rather than an upstream built-in command.
