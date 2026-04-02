@@ -4,7 +4,7 @@ Add task history browsing and round replay support
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -38,3 +38,4 @@ Make past rounds easier to inspect and replay so users can understand how a task
 ## Notes
 
 - This is separate from the narrower `artifacts` command ticket.
+- The CLI now includes a `history` command for stable round-by-round inspection of task progression and artifact references.

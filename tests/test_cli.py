@@ -75,6 +75,13 @@ class CliTests(unittest.TestCase):
         self.assertEqual(args.developer_model, "model-a")
         self.assertEqual(args.max_rounds, 5)
 
+    def test_history_json_parses(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["history", "--json", "--task-id", "pair-1"])
+        self.assertEqual(args.command, "history")
+        self.assertTrue(args.as_json)
+        self.assertEqual(args.task_id, "pair-1")
+
     def test_goal_file_argument_parses(self) -> None:
         parser = build_parser()
         args = parser.parse_args(["start", "--goal-file", "task.md"])

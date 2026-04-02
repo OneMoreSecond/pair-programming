@@ -102,6 +102,11 @@ def build_parser() -> argparse.ArgumentParser:
     artifacts.add_argument("--task-id", default=None, help="inspect a specific task")
     artifacts.add_argument("--round", type=int, default=None, dest="round_number")
 
+    history = subparsers.add_parser("history", help="show round-by-round task history")
+    history.add_argument("--workdir", default=".", help="repository root to run in")
+    history.add_argument("--task-id", default=None, help="inspect a specific task")
+    history.add_argument("--json", action="store_true", dest="as_json")
+
     config_cmd = subparsers.add_parser("config", help="show workflow configuration")
     config_cmd.add_argument("--workdir", default=".", help="repository root to run in")
     config_cmd.add_argument("--json", action="store_true", dest="as_json")
@@ -261,6 +266,38 @@ def print_artifacts(
     for item in paths_to_print:
         if item:
             print(item)
+    return 0
+
+
+def print_history(
+    paths: PairPaths, task_id: str | None = None, as_json: bool = False
+) -> int:
+    try:
+        _, state = _load_state_for_query(paths, task_id)
+    except FileNotFoundError:
+        print("No active task found.", file=sys.stderr)
+        print('Next action: run `opencode-pair start --goal "..."`', file=sys.stderr)
+        return 1
+
+    if as_json:
+        print(json.dumps([record.to_dict() for record in state.rounds], indent=2))
+        return 0
+
+    print(f"Task: {state.task_id}")
+    if not state.rounds:
+        print("No round history available yet.")
+        return 0
+    print("Rounds:")
+    for record in state.rounds:
+        print(
+            f"- round {record.round}: status={record.status}, review_status={record.review_status or '-'}, blocking={record.blocking_count}"
+        )
+        if record.developer_note_path:
+            print(f"  developer_note: {record.developer_note_path}")
+        if record.patch_path:
+            print(f"  patch: {record.patch_path}")
+        if record.review_path:
+            print(f"  review: {record.review_path}")
     return 0
 
 
@@ -459,6 +496,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "artifacts":
         return print_artifacts(paths, args.task_id, args.round_number)
+
+    if args.command == "history":
+        return print_history(paths, args.task_id, args.as_json)
 
     if args.command == "config":
         return print_config(paths, args.as_json)

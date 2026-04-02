@@ -79,6 +79,7 @@ opencode-pair status --verbose
 opencode-pair config
 opencode-pair review --round 2
 opencode-pair artifacts --round 2
+opencode-pair history
 opencode-pair resume --from reviewer
 opencode-pair stop --reason "pause for manual review"
 opencode-pair intervene --focus-only-blocking --note "ignore non-blocking for now"
