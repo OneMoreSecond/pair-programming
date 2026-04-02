@@ -4,7 +4,7 @@ Add configuration and default policy management for the pair workflow
 
 ## Status
 
-todo
+done
 
 ## Priority
 
@@ -43,3 +43,4 @@ Support project-level and task-level configuration for models, modes, test comma
   - `TICK-0040-config-inspect-command.md`
   - `TICK-0041-project-config-file-loading.md`
   - `TICK-0042-config-precedence-and-task-overrides.md`
+- Current implementation now supports config inspection, project defaults, and precedence handling. Remaining parser-default ambiguity is tracked separately in `TICK-0045-distinguish-cli-defaults-from-explicit-args.md`.
